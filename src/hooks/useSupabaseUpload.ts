@@ -3,10 +3,10 @@
 import { useState } from 'react'
 import { uploadFile, getStoragePath } from '@/lib/supabase/storage'
 import { useAuth } from '@/components/providers/AuthProvider'
+import { GUEST_USER_ID } from '@/lib/supabase/admin'
 
 interface UploadResult {
   path: string
-  signedUrl: string
 }
 
 export function useSupabaseUpload(projectId: string) {
@@ -19,16 +19,12 @@ export function useSupabaseUpload(projectId: string) {
     type: 'originals' | 'styled' | 'backgrounds' | 'exports',
     filename?: string
   ): Promise<UploadResult | null> {
-    if (!user) {
-      setError('Not authenticated')
-      return null
-    }
-
     setUploading(true)
     setError(null)
 
+    const userId = user?.id ?? GUEST_USER_ID
     const name = filename || `${crypto.randomUUID()}.${file.name.split('.').pop()}`
-    const path = getStoragePath(user.id, projectId, type, name)
+    const path = getStoragePath(userId, projectId, type, name)
 
     const result = await uploadFile(path, file)
     setUploading(false)
@@ -38,7 +34,7 @@ export function useSupabaseUpload(projectId: string) {
       return null
     }
 
-    return { path: result.path, signedUrl: '' }
+    return { path: result.path }
   }
 
   return { upload, uploading, error }

@@ -1,16 +1,14 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getApiClient } from '@/lib/supabase/api-client'
 import { createProjectSchema } from '@/lib/schemas/validation'
 
 export async function GET() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+  const { supabase, userId } = await getApiClient()
 
   const { data, error } = await supabase
     .from('projects')
     .select('*, style:styles(*)')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .order('updated_at', { ascending: false })
 
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
@@ -18,9 +16,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+  const { supabase, userId } = await getApiClient()
 
   const body = await request.json()
   const parsed = createProjectSchema.safeParse(body)
@@ -30,7 +26,7 @@ export async function POST(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('projects')
-    .insert({ ...parsed.data, user_id: user.id })
+    .insert({ ...parsed.data, user_id: userId })
     .select()
     .single()
 

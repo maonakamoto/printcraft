@@ -1,11 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getApiClient } from '@/lib/supabase/api-client'
 import { upsertCompositionSchema } from '@/lib/schemas/validation'
 
 export async function GET(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+  const { supabase } = await getApiClient()
 
   const projectId = request.nextUrl.searchParams.get('project_id')
   if (!projectId) return NextResponse.json({ success: false, error: 'project_id required' }, { status: 400 })
@@ -23,9 +21,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+  const { supabase } = await getApiClient()
 
   const body = await request.json()
   const parsed = upsertCompositionSchema.safeParse(body)
@@ -33,7 +29,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Invalid data', details: parsed.error.flatten() }, { status: 400 })
   }
 
-  // Get next version number
   const { data: existing } = await supabase
     .from('compositions')
     .select('version')

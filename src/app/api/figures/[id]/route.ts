@@ -1,14 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getApiClient } from '@/lib/supabase/api-client'
 import { updateFigureSchema } from '@/lib/schemas/validation'
 
 type RouteContext = { params: Promise<{ id: string }> }
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
   const { id } = await context.params
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+  const { supabase } = await getApiClient()
 
   const body = await request.json()
   const parsed = updateFigureSchema.safeParse(body)
@@ -29,9 +27,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
 export async function DELETE(_request: NextRequest, context: RouteContext) {
   const { id } = await context.params
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+  const { supabase } = await getApiClient()
 
   const { error } = await supabase
     .from('figures')

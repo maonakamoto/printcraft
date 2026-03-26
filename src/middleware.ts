@@ -25,23 +25,8 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
-
-  const publicPaths = ['/login', '/register']
-  const isPublicPath = publicPaths.some(p => request.nextUrl.pathname.startsWith(p))
-
-  if (!user && !isPublicPath) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
-  }
-
-  if (user && isPublicPath) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/projects'
-    return NextResponse.redirect(url)
-  }
-
+  // Refresh session cookies (no redirects — auth is optional for now)
+  await supabase.auth.getUser()
   return supabaseResponse
 }
 
