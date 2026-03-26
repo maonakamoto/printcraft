@@ -18,7 +18,7 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient())
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
 
     return () => subscription.unsubscribe()
-  }, [supabase.auth])
+  }, [supabase])
 
   return (
     <AuthContext.Provider value={{ user, loading }}>

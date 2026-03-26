@@ -4,6 +4,7 @@ import { use, useState, useEffect } from 'react'
 import { useSurface, useUpsertSurface } from '@/hooks/useSurface'
 import { SURFACE_PRESETS, type SurfacePreset } from '@/lib/config/surface-presets'
 import { getTotalDimensions, getSeamPositionsFromPanels } from '@/lib/domain/surface'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,7 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-import { Check, Plus, X } from 'lucide-react'
+import { Check, Plus, X, ArrowRight } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Panel, DeadZone, SurfaceType } from '@/types/database'
 
@@ -232,7 +233,6 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
         <CardContent>
           <div className="flex items-end gap-0" style={{ height: height_cm * scale }}>
             {panels.map((panel, i) => {
-              const seams = getSeamPositionsFromPanels(panels)
               return (
                 <div
                   key={i}
@@ -273,9 +273,18 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
         </CardContent>
       </Card>
 
-      <Button onClick={handleSave} disabled={upsertSurface.isPending}>
-        {upsertSurface.isPending ? 'Saving...' : existingSurface ? 'Update Surface' : 'Save Surface'}
-      </Button>
+      <div className="flex gap-3 justify-between">
+        <Button onClick={handleSave} disabled={upsertSurface.isPending}>
+          {upsertSurface.isPending ? 'Saving...' : existingSurface ? 'Update Surface' : 'Save Surface'}
+        </Button>
+        {existingSurface && (
+          <Link href={`/project/${id}/compose`}>
+            <Button variant="outline">
+              Continue to Compose <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          </Link>
+        )}
+      </div>
     </div>
   )
 }

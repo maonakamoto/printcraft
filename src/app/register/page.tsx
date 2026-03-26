@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -17,12 +17,12 @@ export default function LoginPage() {
   const router = useRouter()
   const supabase = createClient()
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signUp({ email, password })
 
     if (error) {
       setError(error.message)
@@ -38,10 +38,10 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold tracking-tight">PrintCraft</CardTitle>
-          <p className="text-sm text-muted-foreground">Scene composer for physical art</p>
+          <p className="text-sm text-muted-foreground">Create your account</p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleRegister} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -59,18 +59,19 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
+                minLength={6}
                 required
               />
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? 'Creating account...' : 'Create account'}
             </Button>
           </form>
           <p className="text-sm text-center text-muted-foreground mt-4">
-            Don&apos;t have an account?{' '}
-            <Link href="/register" className="text-primary hover:underline">
-              Create one
+            Already have an account?{' '}
+            <Link href="/login" className="text-primary hover:underline">
+              Sign in
             </Link>
           </p>
         </CardContent>

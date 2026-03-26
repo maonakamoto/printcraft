@@ -74,8 +74,8 @@ export function FigureLayer({
         onTap={onSelect}
         onDragEnd={(e) => {
           const node = e.target
-          const normX = (node.x() / canvasWidth) * totalWidthCm
-          const normY = (node.y() / canvasHeight) * totalHeightCm
+          const normX = node.x() / canvasWidth
+          const normY = node.y() / canvasHeight
           onDragEnd(figure.id, normX, normY)
         }}
         onTransformEnd={() => {

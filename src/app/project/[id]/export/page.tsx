@@ -120,14 +120,16 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
         </div>
       )}
 
-      <Button className="w-full" size="lg" disabled>
-        <Download className="h-4 w-4 mr-2" />
-        Export PNG (coming soon — use Compose view to screenshot for now)
-      </Button>
+      <a href={`/project/${id}/compose`}>
+        <Button className="w-full" size="lg">
+          <Download className="h-4 w-4 mr-2" />
+          Go to Compose to Export PNG
+        </Button>
+      </a>
 
       <p className="text-xs text-muted-foreground text-center">
-        Full export pipeline with per-panel rendering will be implemented in Phase 2.
-        For now, use the composition canvas for visual reference.
+        Use the &quot;Export PNG&quot; button in the Compose toolbar to download your composition.
+        Per-panel splitting at exact DPI will be available in Phase 2.
       </p>
     </div>
   )

@@ -1,10 +1,13 @@
 'use client'
 
 import { use } from 'react'
+import Link from 'next/link'
 import { useProject, useUpdateProject } from '@/hooks/useProject'
 import { useStyles } from '@/hooks/useStyles'
 import { StyleGallery } from '@/components/styles/StyleGallery'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
+import { ArrowRight } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function StylePage({ params }: { params: Promise<{ id: string }> }) {
@@ -43,6 +46,16 @@ export default function StylePage({ params }: { params: Promise<{ id: string }> 
           onSelect={handleSelect}
         />
       ) : null}
+
+      {project?.style_id && (
+        <div className="flex justify-end pt-2">
+          <Link href={`/project/${id}/surface`}>
+            <Button>
+              Continue to Surface <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          </Link>
+        </div>
+      )}
     </div>
   )
 }

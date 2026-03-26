@@ -19,11 +19,14 @@ export function StyleGallery({ styles, selectedId, onSelect }: StyleGalleryProps
         return (
           <Card
             key={style.id}
+            role="button"
+            tabIndex={0}
             className={cn(
               'cursor-pointer transition-all hover:border-primary/50',
               isSelected && 'border-primary ring-1 ring-primary'
             )}
             onClick={() => onSelect(style.id)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(style.id) } }}
           >
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-2">

@@ -1,10 +1,10 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { Stage, Layer, Rect, Line, Text } from 'react-konva'
+import { Stage, Layer, Rect, Line } from 'react-konva'
 import { FigureLayer } from './FigureLayer'
 import { CanvasToolbar } from './CanvasToolbar'
-import { getTotalDimensions, cmToPixels } from '@/lib/domain/surface'
+import { getTotalDimensions } from '@/lib/domain/surface'
 import { useUpdateFigure } from '@/hooks/useFigures'
 import { getSignedUrl } from '@/lib/supabase/storage'
 import type { Figure, Surface } from '@/types/database'
@@ -42,18 +42,18 @@ export function CompositionCanvas({ projectId, figures, surface, backgroundUrl }
     return () => window.removeEventListener('resize', resize)
   }, [aspectRatio])
 
-  // Load signed URLs for styled figures
+  // Load signed URLs for styled figures (parallel)
   useEffect(() => {
     async function loadUrls() {
-      const urls: Record<string, string> = {}
-      for (const fig of figures) {
-        const url = fig.styled_url || fig.original_photo_url
-        if (url) {
+      const entries = await Promise.all(
+        figures.map(async (fig) => {
+          const url = fig.styled_url || fig.original_photo_url
+          if (!url) return null
           const signed = await getSignedUrl(url)
-          if (signed) urls[fig.id] = signed
-        }
-      }
-      setSignedUrls(urls)
+          return signed ? [fig.id, signed] as const : null
+        })
+      )
+      setSignedUrls(Object.fromEntries(entries.filter(Boolean) as [string, string][]))
     }
     loadUrls()
   }, [figures])
@@ -70,14 +70,9 @@ export function CompositionCanvas({ projectId, figures, surface, backgroundUrl }
     })
   }, [backgroundUrl])
 
-  const scaleX = containerSize.width / width_cm
-  const scaleY = containerSize.height / height_cm
-
-  const handleDragEnd = useCallback((figureId: string, x: number, y: number) => {
-    const normX = x / width_cm
-    const normY = y / height_cm
+  const handleDragEnd = useCallback((figureId: string, normX: number, normY: number) => {
     updateFigure.mutate({ id: figureId, data: { position_x: normX, position_y: normY } })
-  }, [width_cm, height_cm, updateFigure])
+  }, [updateFigure])
 
   const handleScaleChange = useCallback((figureId: string, scale: number) => {
     updateFigure.mutate({ id: figureId, data: { scale } })
@@ -90,6 +85,12 @@ export function CompositionCanvas({ projectId, figures, surface, backgroundUrl }
         selectedId={selectedId}
         figures={figures}
         projectId={projectId}
+        onBackgroundUpload={(file) => {
+          const url = URL.createObjectURL(file)
+          const img = new window.Image()
+          img.onload = () => setBgImage(img)
+          img.src = url
+        }}
       />
       <div
         ref={containerRef}

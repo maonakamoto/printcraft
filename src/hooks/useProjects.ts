@@ -3,13 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Project } from '@/types/database'
 import type { CreateProject } from '@/lib/schemas/validation'
-
-async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, init)
-  const json = await res.json()
-  if (!json.success) throw new Error(json.error || 'Request failed')
-  return json.data
-}
+import { fetchJson } from '@/lib/fetchJson'
 
 export function useProjects() {
   return useQuery<Project[]>({
