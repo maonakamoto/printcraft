@@ -8,5 +8,5 @@ export function createAdminClient() {
   )
 }
 
-// Default guest user ID for unauthenticated access
-export const GUEST_USER_ID = '00000000-0000-0000-0000-000000000000'
+// Re-export for server-side code that already imports from here
+export { GUEST_USER_ID } from '@/lib/constants'

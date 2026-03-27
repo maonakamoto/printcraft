@@ -15,15 +15,23 @@ export interface SurfacePreset {
 export const SURFACE_PRESETS: SurfacePreset[] = [
   {
     id: 'shower-2-panel',
-    name: 'Shower Wall (2 panels)',
-    description: 'L-shaped glass shower wall with 2 panels',
+    name: 'Duschwand (2 panels)',
+    description: 'L-shaped glass shower wall — 77.5 + 119.5 cm, with fixture zone',
     type: 'glass',
     panels: [
       { width_cm: 77.5, height_cm: 190 },
       { width_cm: 119.5, height_cm: 190 },
     ],
     seam_positions: [{ x_cm: 77.5 }],
-    dead_zones: [],
+    dead_zones: [
+      {
+        x_cm: 18.75,
+        y_cm: 0,
+        width_cm: 40,
+        height_cm: 45,
+        reason: 'Dusch Armatur',
+      },
+    ],
     dpi_target: 200,
     bleed_mm: 3,
   },

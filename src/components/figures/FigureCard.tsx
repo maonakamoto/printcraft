@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Trash2, Upload, Check } from 'lucide-react'
-import { getSignedUrl } from '@/lib/supabase/storage'
+import { getImageUrl } from '@/lib/supabase/storage'
 import { useUpdateFigure, useDeleteFigure } from '@/hooks/useFigures'
 import { useSupabaseUpload } from '@/hooks/useSupabaseUpload'
 import { toast } from 'sonner'
@@ -19,18 +19,12 @@ interface FigureCardProps {
 
 export function FigureCard({ figure, projectId }: FigureCardProps) {
   const [label, setLabel] = useState(figure.label ?? '')
-  const [originalUrl, setOriginalUrl] = useState<string | null>(null)
-  const [styledUrl, setStyledUrl] = useState<string | null>(null)
   const updateFigure = useUpdateFigure(projectId)
   const deleteFigure = useDeleteFigure(projectId)
   const { upload, uploading } = useSupabaseUpload(projectId)
 
-  useEffect(() => {
-    getSignedUrl(figure.original_photo_url).then(setOriginalUrl)
-    if (figure.styled_url) {
-      getSignedUrl(figure.styled_url).then(setStyledUrl)
-    }
-  }, [figure.original_photo_url, figure.styled_url])
+  const originalUrl = getImageUrl(figure.original_photo_url)
+  const styledUrl = figure.styled_url ? getImageUrl(figure.styled_url) : null
 
   function handleLabelBlur() {
     if (label !== (figure.label ?? '')) {
@@ -65,9 +59,7 @@ export function FigureCard({ figure, projectId }: FigureCardProps) {
         <div className="flex gap-3">
           {/* Original photo */}
           <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-            {originalUrl && (
-              <img src={originalUrl} alt={figure.label ?? 'Figure'} className="w-full h-full object-cover" />
-            )}
+            <img src={originalUrl} alt={figure.label ?? 'Figure'} className="w-full h-full object-cover" />
           </div>
 
           {/* Styled version */}

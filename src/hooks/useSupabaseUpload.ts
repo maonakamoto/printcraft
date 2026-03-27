@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { uploadFile, getStoragePath } from '@/lib/supabase/storage'
 import { useAuth } from '@/components/providers/AuthProvider'
-import { GUEST_USER_ID } from '@/lib/supabase/admin'
+import { GUEST_USER_ID } from '@/lib/constants'
 
 interface UploadResult {
   path: string

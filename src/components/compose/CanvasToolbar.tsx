@@ -32,14 +32,26 @@ export function CanvasToolbar({ stageRef, selectedId, figures, projectId, onBack
     const stage = stageRef.current
     if (!stage) return
     try {
-      const dataUrl = stage.toDataURL({ pixelRatio: 2 })
+      // Export at max quality — 4x gives ~3200x2400 from an 800px canvas
+      // For full print DPI, use the Export page (Phase 2)
+      const dataUrl = stage.toDataURL({ pixelRatio: 4 })
       const link = document.createElement('a')
       link.download = `printcraft-composition.png`
       link.href = dataUrl
       link.click()
-      toast.success('PNG exported')
+      toast.success('PNG exported (4x resolution)')
     } catch (err) {
-      toast.error('Export failed — images may be cross-origin')
+      // Canvas size limit hit — fall back to 2x
+      try {
+        const dataUrl = stageRef.current!.toDataURL({ pixelRatio: 2 })
+        const link = document.createElement('a')
+        link.download = `printcraft-composition.png`
+        link.href = dataUrl
+        link.click()
+        toast.success('PNG exported (2x resolution)')
+      } catch {
+        toast.error('Export failed — try a smaller canvas')
+      }
     }
   }
 

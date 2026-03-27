@@ -6,7 +6,7 @@ import { FigureLayer } from './FigureLayer'
 import { CanvasToolbar } from './CanvasToolbar'
 import { getTotalDimensions } from '@/lib/domain/surface'
 import { useUpdateFigure } from '@/hooks/useFigures'
-import { getSignedUrl } from '@/lib/supabase/storage'
+import { getImageUrl } from '@/lib/supabase/storage'
 import type { Figure, Surface } from '@/types/database'
 import type Konva from 'konva'
 
@@ -14,15 +14,13 @@ interface CompositionCanvasProps {
   projectId: string
   figures: Figure[]
   surface: Surface
-  backgroundUrl?: string | null
 }
 
-export function CompositionCanvas({ projectId, figures, surface, backgroundUrl }: CompositionCanvasProps) {
+export function CompositionCanvas({ projectId, figures, surface }: CompositionCanvasProps) {
   const stageRef = useRef<Konva.Stage>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerSize, setContainerSize] = useState({ width: 800, height: 600 })
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({})
   const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null)
   const updateFigure = useUpdateFigure(projectId)
 
@@ -42,33 +40,12 @@ export function CompositionCanvas({ projectId, figures, surface, backgroundUrl }
     return () => window.removeEventListener('resize', resize)
   }, [aspectRatio])
 
-  // Load signed URLs for styled figures (parallel)
-  useEffect(() => {
-    async function loadUrls() {
-      const entries = await Promise.all(
-        figures.map(async (fig) => {
-          const url = fig.styled_url || fig.original_photo_url
-          if (!url) return null
-          const signed = await getSignedUrl(url)
-          return signed ? [fig.id, signed] as const : null
-        })
-      )
-      setSignedUrls(Object.fromEntries(entries.filter(Boolean) as [string, string][]))
-    }
-    loadUrls()
-  }, [figures])
-
-  // Load background
-  useEffect(() => {
-    if (!backgroundUrl) { setBgImage(null); return }
-    getSignedUrl(backgroundUrl).then(url => {
-      if (!url) return
-      const img = new window.Image()
-      img.crossOrigin = 'anonymous'
-      img.onload = () => setBgImage(img)
-      img.src = url
-    })
-  }, [backgroundUrl])
+  // Build image URLs (synchronous — public bucket)
+  const imageUrls: Record<string, string> = {}
+  for (const fig of figures) {
+    const path = fig.styled_url || fig.original_photo_url
+    if (path) imageUrls[fig.id] = getImageUrl(path)
+  }
 
   const handleDragEnd = useCallback((figureId: string, normX: number, normY: number) => {
     updateFigure.mutate({ id: figureId, data: { position_x: normX, position_y: normY } })
@@ -125,13 +102,13 @@ export function CompositionCanvas({ projectId, figures, surface, backgroundUrl }
           {/* Figures */}
           <Layer>
             {figures
-              .filter(f => signedUrls[f.id])
+              .filter(f => imageUrls[f.id])
               .sort((a, b) => a.z_depth - b.z_depth)
               .map(figure => (
                 <FigureLayer
                   key={figure.id}
                   figure={figure}
-                  imageUrl={signedUrls[figure.id]}
+                  imageUrl={imageUrls[figure.id]}
                   canvasWidth={containerSize.width}
                   canvasHeight={containerSize.height}
                   totalWidthCm={width_cm}
