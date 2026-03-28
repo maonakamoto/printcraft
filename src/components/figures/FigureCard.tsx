@@ -55,26 +55,26 @@ export function FigureCard({ figure, projectId }: FigureCardProps) {
 
   return (
     <Card className="overflow-hidden">
-      <CardContent className="p-3">
-        <div className="flex gap-3">
+      <CardContent className="p-4">
+        <div className="flex gap-4">
           {/* Original photo */}
-          <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+          <div className="w-32 h-32 rounded-xl overflow-hidden bg-muted flex-shrink-0">
             <img src={originalUrl} alt={figure.label ?? 'Figure'} className="w-full h-full object-cover" />
           </div>
 
           {/* Styled version */}
-          <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted flex-shrink-0 relative group">
+          <div className="w-32 h-32 rounded-xl overflow-hidden bg-muted flex-shrink-0 relative group">
             {styledUrl ? (
               <>
                 <img src={styledUrl} alt="Styled" className="w-full h-full object-cover" />
-                <Badge className="absolute bottom-1 left-1 text-[10px]" variant="secondary">
-                  <Check className="h-3 w-3 mr-0.5" /> Styled
+                <Badge className="absolute bottom-1.5 left-1.5 text-xs" variant="secondary">
+                  <Check className="h-3 w-3 mr-1" /> Styled
                 </Badge>
               </>
             ) : (
               <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-muted/80 transition-colors">
-                <Upload className="h-4 w-4 text-muted-foreground mb-1" />
-                <span className="text-[10px] text-muted-foreground">
+                <Upload className="h-5 w-5 text-muted-foreground mb-1.5" />
+                <span className="text-xs text-muted-foreground">
                   {uploading ? 'Uploading...' : 'Upload styled'}
                 </span>
                 <input type="file" className="hidden" accept="image/*" onChange={handleStyledUpload} disabled={uploading} />
@@ -89,14 +89,14 @@ export function FigureCard({ figure, projectId }: FigureCardProps) {
               onChange={e => setLabel(e.target.value)}
               onBlur={handleLabelBlur}
               placeholder="Label (e.g., Roli + girlfriend)"
-              className="h-8 text-sm"
+              className="h-9 text-base"
             />
-            <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center justify-between mt-3">
               <Badge variant="outline" className="text-xs">
                 {figure.status}
               </Badge>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleDelete}>
-                <Trash2 className="h-3.5 w-3.5 text-destructive" />
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleDelete}>
+                <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
             </div>
           </div>

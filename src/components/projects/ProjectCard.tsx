@@ -24,11 +24,11 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, onDelete }: ProjectCardProps) {
   return (
-    <Card className="group relative hover:border-primary/50 transition-colors">
+    <Card className="group relative transition-all duration-200 hover:ring-1 hover:ring-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5">
       <Link href={`/project/${project.id}/figures`} className="block">
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
-            <CardTitle className="text-base">{project.name}</CardTitle>
+            <CardTitle className="text-lg">{project.name}</CardTitle>
             <Badge variant="secondary" className="text-xs">
               {STATUS_LABELS[project.status] ?? project.status}
             </Badge>
@@ -36,14 +36,14 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
         </CardHeader>
         <CardContent>
           {project.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
               {project.description}
             </p>
           )}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {project.style && (
-              <span className="flex items-center gap-1">
-                <ImageIcon className="h-3 w-3" />
+              <span className="flex items-center gap-1.5">
+                <ImageIcon className="h-4 w-4" />
                 {project.style.name}
               </span>
             )}
@@ -53,7 +53,7 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
         onClick={(e) => { e.preventDefault(); onDelete(project.id) }}
       >
         <Trash2 className="h-4 w-4 text-destructive" />

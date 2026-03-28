@@ -38,13 +38,13 @@ export default function NewProjectPage() {
 
   return (
     <AppShell>
-      <div className="p-6 max-w-lg mx-auto w-full">
+      <div className="p-8 max-w-xl mx-auto w-full">
         <Card>
           <CardHeader>
             <CardTitle>New Project</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
                 <Input

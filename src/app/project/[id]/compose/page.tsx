@@ -51,10 +51,10 @@ export default function ComposePage({ params }: { params: Promise<{ id: string }
   }
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-8 space-y-6">
       <div>
-        <h2 className="text-xl font-bold tracking-tight">Compose</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-2xl font-semibold tracking-tight">Compose</h2>
+        <p className="text-base text-muted-foreground mt-1">
           Drag figures into position. Red dashed lines show panel seams. Red zones are dead zones.
         </p>
       </div>

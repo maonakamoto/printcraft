@@ -61,23 +61,23 @@ export function CanvasToolbar({ stageRef, selectedId, figures, projectId, onBack
   }
 
   return (
-    <div className="flex items-center gap-2 px-2 flex-wrap">
+    <div className="flex items-center gap-3 px-5 py-3 rounded-xl glass border border-white/[0.06] flex-wrap">
       <Button variant="outline" size="sm" disabled={!selectedId} onClick={() => moveLayer('up')}>
-        <ArrowUp className="h-3 w-3 mr-1" /> Forward
+        <ArrowUp className="h-4 w-4 mr-1.5" /> Forward
       </Button>
       <Button variant="outline" size="sm" disabled={!selectedId} onClick={() => moveLayer('down')}>
-        <ArrowDown className="h-3 w-3 mr-1" /> Back
+        <ArrowDown className="h-4 w-4 mr-1.5" /> Back
       </Button>
 
       <Separator orientation="vertical" className="h-6" />
 
       <Button variant="outline" size="sm" onClick={() => bgInputRef.current?.click()}>
-        <ImagePlus className="h-3 w-3 mr-1" /> Background
+        <ImagePlus className="h-4 w-4 mr-1.5" /> Background
       </Button>
       <input ref={bgInputRef} type="file" className="hidden" accept="image/*" onChange={handleBgFileChange} />
 
-      <Button variant="outline" size="sm" onClick={handleExportPng}>
-        <Download className="h-3 w-3 mr-1" /> Export PNG
+      <Button variant="default" size="sm" onClick={handleExportPng}>
+        <Download className="h-4 w-4 mr-1.5" /> Export PNG
       </Button>
 
       <Separator orientation="vertical" className="h-6" />

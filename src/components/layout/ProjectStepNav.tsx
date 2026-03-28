@@ -29,43 +29,45 @@ export function ProjectStepNav({ projectId }: { projectId: string }) {
   if (figures?.some(f => f.styled_url)) completedSteps.add('compose')
 
   return (
-    <nav className="border-b border-border/40">
-      <div className="flex items-center gap-1 px-6 overflow-x-auto">
+    <nav className="border-b border-white/[0.06] bg-background">
+      <div className="flex items-center gap-2 px-8 py-3 overflow-x-auto">
         <Link
           href="/projects"
-          className="flex items-center gap-1 px-3 py-3 text-sm text-muted-foreground hover:text-foreground transition-colors mr-2"
+          className="flex items-center gap-1.5 px-4 py-2 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-white/[0.04] transition-all mr-3"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="hidden sm:inline">{project?.name ?? 'Back'}</span>
         </Link>
 
-        <div className="h-6 w-px bg-border/40 mr-2" />
+        <div className="h-6 w-px bg-white/[0.08] mr-3" />
 
-        {STEPS.map((step) => {
-          const href = `/project/${projectId}/${step.href}`
-          const isActive = pathname.endsWith(`/${step.href}`)
-          const isComplete = completedSteps.has(step.id)
+        <div className="flex items-center gap-1 rounded-xl bg-white/[0.04] p-1">
+          {STEPS.map((step) => {
+            const href = `/project/${projectId}/${step.href}`
+            const isActive = pathname.endsWith(`/${step.href}`)
+            const isComplete = completedSteps.has(step.id)
 
-          return (
-            <Link
-              key={step.id}
-              href={href}
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap',
-                isActive
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-              )}
-            >
-              {isComplete && !isActive ? (
-                <Check className="h-3.5 w-3.5 text-green-500" />
-              ) : (
-                <step.icon className="h-3.5 w-3.5" />
-              )}
-              <span className="hidden sm:inline">{step.label}</span>
-            </Link>
-          )
-        })}
+            return (
+              <Link
+                key={step.id}
+                href={href}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap',
+                  isActive
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
+                )}
+              >
+                {isComplete && !isActive ? (
+                  <Check className="h-4 w-4 text-primary" />
+                ) : (
+                  <step.icon className="h-4 w-4" />
+                )}
+                <span className="hidden sm:inline">{step.label}</span>
+              </Link>
+            )
+          })}
+        </div>
       </div>
     </nav>
   )

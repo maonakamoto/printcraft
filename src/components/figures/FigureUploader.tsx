@@ -46,17 +46,17 @@ export function FigureUploader({ projectId }: FigureUploaderProps) {
     <div
       {...getRootProps()}
       className={`
-        border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors
-        ${isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}
+        border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200
+        ${isDragActive ? 'border-primary bg-primary/5 scale-[1.01]' : 'border-border hover:border-primary/50'}
         ${uploading ? 'opacity-50 cursor-wait' : ''}
       `}
     >
       <input {...getInputProps()} />
-      <Upload className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
-      <p className="text-sm font-medium">
+      <Upload className="h-10 w-10 mx-auto mb-4 text-muted-foreground" />
+      <p className="text-base font-medium">
         {uploading ? 'Uploading...' : isDragActive ? 'Drop photos here' : 'Drop photos or click to upload'}
       </p>
-      <p className="text-xs text-muted-foreground mt-1">
+      <p className="text-sm text-muted-foreground mt-2">
         PNG, JPG, WEBP — one photo per person or group
       </p>
     </div>

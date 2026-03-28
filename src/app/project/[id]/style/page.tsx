@@ -27,17 +27,17 @@ export default function StylePage({ params }: { params: Promise<{ id: string }> 
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto w-full space-y-6">
+    <div className="p-8 max-w-5xl mx-auto w-full space-y-8">
       <div>
-        <h2 className="text-xl font-bold tracking-tight">Art Style</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-2xl font-semibold tracking-tight">Art Style</h2>
+        <p className="text-base text-muted-foreground mt-1">
           Choose the emotional tone for your artwork
         </p>
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-32 rounded-xl" />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-40 rounded-xl" />)}
         </div>
       ) : styles ? (
         <StyleGallery
@@ -51,7 +51,7 @@ export default function StylePage({ params }: { params: Promise<{ id: string }> 
         <div className="flex justify-end pt-2">
           <Link href={`/project/${id}/surface`}>
             <Button>
-              Continue to Surface <ArrowRight className="h-4 w-4 ml-1" />
+              Continue to Surface <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>
         </div>

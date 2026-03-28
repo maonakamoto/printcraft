@@ -23,11 +23,11 @@ export default function ProjectsPage() {
 
   return (
     <AppShell>
-      <div className="p-6 max-w-5xl mx-auto w-full">
-        <div className="flex items-center justify-between mb-8">
+      <div className="px-8 py-10 max-w-6xl mx-auto w-full">
+        <div className="flex items-center justify-between mb-10">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Projects</h1>
-            <p className="text-sm text-muted-foreground">Your artwork compositions</p>
+            <h1 className="text-3xl font-semibold tracking-tight">Projects</h1>
+            <p className="text-base text-muted-foreground mt-1">Your artwork compositions</p>
           </div>
           <Link href="/projects/new">
             <Button>
@@ -38,22 +38,22 @@ export default function ProjectsPage() {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-36 rounded-xl" />
+              <Skeleton key={i} className="h-48 rounded-xl" />
             ))}
           </div>
         ) : projects?.length ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map(project => (
               <ProjectCard key={project.id} project={project} onDelete={handleDelete} />
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <ImageIcon className="h-12 w-12 text-muted-foreground/50 mb-4" />
-            <h2 className="text-lg font-medium mb-1">No projects yet</h2>
-            <p className="text-sm text-muted-foreground mb-4">
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <ImageIcon className="h-16 w-16 text-muted-foreground/30 mb-6" />
+            <h2 className="text-xl font-semibold mb-2">No projects yet</h2>
+            <p className="text-base text-muted-foreground mb-6">
               Create your first artwork composition
             </p>
             <Link href="/projects/new">

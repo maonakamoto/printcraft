@@ -5,6 +5,7 @@ import { useSurface } from '@/hooks/useSurface'
 import { useFigures } from '@/hooks/useFigures'
 import { calculateExportDimensions } from '@/lib/domain/export'
 import { getTotalDimensions } from '@/lib/domain/surface'
+import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -39,10 +40,10 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
   const totalCount = figures?.length ?? 0
 
   return (
-    <div className="p-6 max-w-3xl mx-auto w-full space-y-6">
+    <div className="p-8 max-w-4xl mx-auto w-full space-y-8">
       <div>
-        <h2 className="text-xl font-bold tracking-tight">Export</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-2xl font-semibold tracking-tight">Export</h2>
+        <p className="text-base text-muted-foreground mt-1">
           Generate print-ready files for your artwork
         </p>
       </div>
@@ -77,7 +78,12 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
           {DPI_OPTIONS.map(opt => (
             <Card
               key={opt.value}
-              className={`cursor-pointer transition-all ${dpi === opt.value ? 'border-primary ring-1 ring-primary' : 'hover:border-primary/50'}`}
+              className={cn(
+                'cursor-pointer transition-all duration-200',
+                dpi === opt.value
+                  ? 'ring-2 ring-primary shadow-lg shadow-primary/10'
+                  : 'hover:ring-1 hover:ring-primary/30'
+              )}
               onClick={() => setDpi(opt.value)}
             >
               <CardContent className="p-3 text-center">
@@ -121,7 +127,7 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
       )}
 
       <a href={`/project/${id}/compose`}>
-        <Button className="w-full" size="lg">
+        <Button className="w-full h-12 text-base font-semibold" size="lg">
           <Download className="h-4 w-4 mr-2" />
           Go to Compose to Export PNG
         </Button>

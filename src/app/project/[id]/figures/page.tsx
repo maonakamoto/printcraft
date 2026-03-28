@@ -14,48 +14,45 @@ export default function FiguresPage({ params }: { params: Promise<{ id: string }
   const { id } = use(params)
   const { data: figures, isLoading } = useFigures(id)
 
-  const hasStyledFigures = figures?.some(f => f.styled_url)
-
   return (
-    <div className="p-6 max-w-3xl mx-auto w-full space-y-6">
+    <div className="p-8 max-w-4xl mx-auto w-full space-y-8">
       <div>
-        <h2 className="text-xl font-bold tracking-tight">Figures</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-2xl font-semibold tracking-tight">Figures</h2>
+        <p className="text-base text-muted-foreground mt-1">
           Upload photos of the people for your artwork.
         </p>
       </div>
 
       <FigureUploader projectId={id} />
 
-      {/* Phase 1 workflow explanation */}
-      <Card className="border-blue-500/20 bg-blue-500/5">
-        <CardContent className="p-4 flex gap-3">
-          <Info className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-muted-foreground space-y-1">
-            <p className="font-medium text-foreground">How it works (Phase 1)</p>
-            <ol className="list-decimal list-inside space-y-0.5 text-xs">
-              <li>Upload the original photo of each person/group</li>
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="p-5 flex gap-4">
+          <Info className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+          <div className="space-y-2">
+            <p className="font-medium">How it works</p>
+            <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
+              <li>Upload the original photo of each person or group</li>
               <li>Choose an art style in the next step</li>
-              <li>Use an AI tool (e.g., Grok, Midjourney) to generate a styled cartoon version</li>
-              <li>Upload the styled version here using the &quot;Upload styled&quot; button on each card</li>
-              <li>Compose all styled figures together in the canvas editor</li>
+              <li>Use an AI tool (Grok, Midjourney) to generate a styled version</li>
+              <li>Upload the styled version using the &quot;Upload styled&quot; button on each card</li>
+              <li>Compose all styled figures together on the canvas</li>
             </ol>
           </div>
         </CardContent>
       </Card>
 
       {isLoading ? (
-        <div className="space-y-3">
-          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-28 rounded-xl" />)}
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-36 rounded-xl" />)}
         </div>
       ) : figures?.length ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {figures.map(figure => (
             <FigureCard key={figure.id} figure={figure} projectId={id} />
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground text-center py-4">
+        <p className="text-base text-muted-foreground text-center py-6">
           No figures yet. Drop photos above to get started.
         </p>
       )}
@@ -64,7 +61,7 @@ export default function FiguresPage({ params }: { params: Promise<{ id: string }
         <div className="flex justify-end pt-2">
           <Link href={`/project/${id}/style`}>
             <Button>
-              Continue to Style <ArrowRight className="h-4 w-4 ml-1" />
+              Continue to Style <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>
         </div>

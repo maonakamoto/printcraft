@@ -99,16 +99,16 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
   const scale = Math.min(500 / width_cm, 300 / height_cm, 2)
 
   return (
-    <div className="p-6 max-w-4xl mx-auto w-full space-y-6">
+    <div className="p-8 max-w-5xl mx-auto w-full space-y-8">
       <div>
-        <h2 className="text-xl font-bold tracking-tight">Surface</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-2xl font-semibold tracking-tight">Surface</h2>
+        <p className="text-base text-muted-foreground mt-1">
           Define the physical surface this artwork will be printed on
         </p>
       </div>
 
       {/* Presets */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {SURFACE_PRESETS.map(preset => (
           <Card
             key={preset.id}

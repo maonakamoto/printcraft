@@ -35,13 +35,13 @@ export default function RegisterPage() {
 
   return (
     <div className="flex flex-1 items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight">PrintCraft</CardTitle>
-          <p className="text-sm text-muted-foreground">Create your account</p>
+          <CardTitle className="text-3xl font-semibold tracking-tight">PrintCraft</CardTitle>
+          <p className="text-base text-muted-foreground mt-1">Create your account</p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleRegister} className="space-y-4">
+          <form onSubmit={handleRegister} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -64,7 +64,7 @@ export default function RegisterPage() {
               />
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full h-10 text-base" disabled={loading}>
               {loading ? 'Creating account...' : 'Create account'}
             </Button>
           </form>

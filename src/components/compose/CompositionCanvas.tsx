@@ -71,7 +71,7 @@ export function CompositionCanvas({ projectId, figures, surface }: CompositionCa
       />
       <div
         ref={containerRef}
-        className="border border-border rounded-lg overflow-hidden bg-black"
+        className="rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/[0.06]"
       >
         <Stage
           ref={stageRef}
