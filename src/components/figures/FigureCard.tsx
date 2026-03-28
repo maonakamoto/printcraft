@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -54,26 +53,26 @@ export function FigureCard({ figure, projectId }: FigureCardProps) {
   }
 
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-4">
-        <div className="flex gap-4">
+    <div className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.03] transition-all duration-300 overflow-hidden">
+      <div className="p-5">
+        <div className="flex gap-5">
           {/* Original photo */}
-          <div className="w-32 h-32 rounded-xl overflow-hidden bg-muted flex-shrink-0">
+          <div className="w-36 h-36 rounded-xl overflow-hidden bg-white/[0.03] border border-white/[0.04] shrink-0">
             <img src={originalUrl} alt={figure.label ?? 'Figure'} className="w-full h-full object-cover" />
           </div>
 
           {/* Styled version */}
-          <div className="w-32 h-32 rounded-xl overflow-hidden bg-muted flex-shrink-0 relative group">
+          <div className="w-36 h-36 rounded-xl overflow-hidden bg-white/[0.03] border border-white/[0.04] shrink-0 relative">
             {styledUrl ? (
               <>
                 <img src={styledUrl} alt="Styled" className="w-full h-full object-cover" />
-                <Badge className="absolute bottom-1.5 left-1.5 text-xs" variant="secondary">
+                <Badge className="absolute bottom-2 left-2 text-xs rounded-full" variant="secondary">
                   <Check className="h-3 w-3 mr-1" /> Styled
                 </Badge>
               </>
             ) : (
-              <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-muted/80 transition-colors">
-                <Upload className="h-5 w-5 text-muted-foreground mb-1.5" />
+              <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-white/[0.04] transition-colors">
+                <Upload className="h-5 w-5 text-muted-foreground mb-2" />
                 <span className="text-xs text-muted-foreground">
                   {uploading ? 'Uploading...' : 'Upload styled'}
                 </span>
@@ -83,25 +82,30 @@ export function FigureCard({ figure, projectId }: FigureCardProps) {
           </div>
 
           {/* Info */}
-          <div className="flex-1 min-w-0 flex flex-col justify-between">
+          <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
             <Input
               value={label}
               onChange={e => setLabel(e.target.value)}
               onBlur={handleLabelBlur}
               placeholder="Label (e.g., Roli + girlfriend)"
-              className="h-9 text-base"
+              className="h-10 text-base bg-transparent border-white/[0.06]"
             />
             <div className="flex items-center justify-between mt-3">
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs rounded-full">
                 {figure.status}
               </Badge>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleDelete}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10"
+                onClick={handleDelete}
+              >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

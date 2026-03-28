@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Trash2, Image as ImageIcon } from 'lucide-react'
+import { Trash2, Palette, ArrowUpRight } from 'lucide-react'
 import type { Project } from '@/types/database'
 
 const STATUS_LABELS: Record<string, string> = {
@@ -24,39 +24,48 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, onDelete }: ProjectCardProps) {
   return (
-    <Card className="group relative transition-all duration-200 hover:ring-1 hover:ring-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5">
+    <Card className="group relative overflow-hidden rounded-2xl border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-300 card-hover">
       <Link href={`/project/${project.id}/figures`} className="block">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <CardTitle className="text-lg">{project.name}</CardTitle>
-            <Badge variant="secondary" className="text-xs">
-              {STATUS_LABELS[project.status] ?? project.status}
-            </Badge>
+        {/* Top accent bar */}
+        <div className="h-1 w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent group-hover:via-primary/40 transition-all duration-500" />
+
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between mb-4">
+            <h3 className="text-lg font-medium tracking-tight group-hover:text-primary transition-colors line-clamp-1">
+              {project.name}
+            </h3>
+            <ArrowUpRight className="h-4 w-4 text-muted-foreground/0 group-hover:text-muted-foreground transition-all duration-300 shrink-0 mt-1" />
           </div>
-        </CardHeader>
-        <CardContent>
+
           {project.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-5 leading-relaxed">
               {project.description}
             </p>
           )}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            {project.style && (
-              <span className="flex items-center gap-1.5">
-                <ImageIcon className="h-4 w-4" />
-                {project.style.name}
-              </span>
-            )}
+
+          <div className="flex items-center justify-between pt-4 border-t border-white/[0.04]">
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-xs font-normal rounded-full px-3">
+                {STATUS_LABELS[project.status] ?? project.status}
+              </Badge>
+              {project.style && (
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Palette className="h-3 w-3" />
+                  {project.style.name}
+                </span>
+              )}
+            </div>
           </div>
         </CardContent>
       </Link>
+
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+        className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-200 h-8 w-8 rounded-full hover:bg-destructive/10"
         onClick={(e) => { e.preventDefault(); onDelete(project.id) }}
       >
-        <Trash2 className="h-4 w-4 text-destructive" />
+        <Trash2 className="h-3.5 w-3.5 text-destructive" />
       </Button>
     </Card>
   )

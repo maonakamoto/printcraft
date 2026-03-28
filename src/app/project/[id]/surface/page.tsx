@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { Check, Plus, X, ArrowRight } from 'lucide-react'
 import { toast } from 'sonner'
@@ -99,154 +98,163 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
   const scale = Math.min(500 / width_cm, 300 / height_cm, 2)
 
   return (
-    <div className="p-8 max-w-5xl mx-auto w-full space-y-8">
+    <div className="max-w-5xl mx-auto w-full px-6 sm:px-8 py-10 space-y-10 animate-in-page">
       <div>
-        <h2 className="text-2xl font-semibold tracking-tight">Surface</h2>
-        <p className="text-base text-muted-foreground mt-1">
+        <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">Surface</h2>
+        <p className="text-muted-foreground mt-2 text-lg font-light">
           Define the physical surface this artwork will be printed on
         </p>
       </div>
 
       {/* Presets */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {SURFACE_PRESETS.map(preset => (
-          <Card
-            key={preset.id}
-            className={cn(
-              'cursor-pointer transition-all hover:border-primary/50',
-              selectedPreset === preset.id && 'border-primary ring-1 ring-primary'
-            )}
-            onClick={() => applyPreset(preset)}
-          >
-            <CardContent className="p-3">
+      <div>
+        <Label className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4 block">
+          Presets
+        </Label>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {SURFACE_PRESETS.map(preset => (
+            <button
+              key={preset.id}
+              className={cn(
+                'p-4 rounded-2xl border text-left transition-all duration-200 card-hover',
+                selectedPreset === preset.id
+                  ? 'border-primary bg-primary/5 ring-1 ring-primary/30 glow-selected'
+                  : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]'
+              )}
+              onClick={() => applyPreset(preset)}
+            >
               <p className="text-sm font-medium">{preset.name}</p>
-              <p className="text-xs text-muted-foreground">{preset.description}</p>
-            </CardContent>
-          </Card>
-        ))}
+              <p className="text-xs text-muted-foreground mt-1">{preset.description}</p>
+              {selectedPreset === preset.id && (
+                <Check className="h-4 w-4 text-primary mt-2" />
+              )}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <Separator />
+      <div className="section-divider" />
 
       {/* Panels */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="flex items-center justify-between">
-          <h3 className="font-medium">Panels</h3>
-          <Button variant="outline" size="sm" onClick={addPanel}>
-            <Plus className="h-3 w-3 mr-1" /> Add Panel
+          <div>
+            <h3 className="font-medium text-lg">Panels</h3>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Total: {width_cm.toFixed(1)} x {height_cm.toFixed(1)} cm
+            </p>
+          </div>
+          <Button variant="outline" size="sm" className="rounded-full" onClick={addPanel}>
+            <Plus className="h-3 w-3 mr-1.5" /> Add Panel
           </Button>
         </div>
         {panels.map((panel, i) => (
-          <div key={i} className="flex items-end gap-3">
-            <div className="space-y-1">
-              <Label className="text-xs">Width (cm)</Label>
+          <div key={i} className="flex items-end gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Width (cm)</Label>
               <Input
                 type="number"
                 value={panel.width_cm}
                 onChange={e => updatePanel(i, 'width_cm', parseFloat(e.target.value) || 0)}
-                className="w-28 h-8"
+                className="w-28 h-9"
               />
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Height (cm)</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Height (cm)</Label>
               <Input
                 type="number"
                 value={panel.height_cm}
                 onChange={e => updatePanel(i, 'height_cm', parseFloat(e.target.value) || 0)}
-                className="w-28 h-8"
+                className="w-28 h-9"
               />
             </div>
-            <Badge variant="outline" className="mb-1">Panel {i + 1}</Badge>
+            <Badge variant="outline" className="mb-1.5 rounded-full">Panel {i + 1}</Badge>
             {panels.length > 1 && (
-              <Button variant="ghost" size="icon" className="h-8 w-8 mb-0.5" onClick={() => removePanel(i)}>
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full mb-0.5" onClick={() => removePanel(i)}>
                 <X className="h-3 w-3" />
               </Button>
             )}
           </div>
         ))}
-        <p className="text-xs text-muted-foreground">
-          Total: {width_cm.toFixed(1)} x {height_cm.toFixed(1)} cm
-        </p>
       </div>
 
-      <Separator />
+      <div className="section-divider" />
 
       {/* Dead Zones */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium">Dead Zones</h3>
-            <p className="text-xs text-muted-foreground">Areas blocked by fixtures (shower head, faucet, etc.)</p>
+            <h3 className="font-medium text-lg">Dead Zones</h3>
+            <p className="text-sm text-muted-foreground mt-0.5">Areas blocked by fixtures (shower head, faucet, etc.)</p>
           </div>
-          <Button variant="outline" size="sm" onClick={addDeadZone}>
-            <Plus className="h-3 w-3 mr-1" /> Add Zone
+          <Button variant="outline" size="sm" className="rounded-full" onClick={addDeadZone}>
+            <Plus className="h-3 w-3 mr-1.5" /> Add Zone
           </Button>
         </div>
         {deadZones.map((zone, i) => (
-          <div key={i} className="flex items-end gap-2 flex-wrap">
-            <div className="space-y-1">
-              <Label className="text-xs">X (cm)</Label>
-              <Input type="number" value={zone.x_cm} onChange={e => updateDeadZone(i, 'x_cm', parseFloat(e.target.value) || 0)} className="w-20 h-8" />
+          <div key={i} className="flex items-end gap-2 flex-wrap p-4 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">X (cm)</Label>
+              <Input type="number" value={zone.x_cm} onChange={e => updateDeadZone(i, 'x_cm', parseFloat(e.target.value) || 0)} className="w-20 h-9" />
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Y (cm)</Label>
-              <Input type="number" value={zone.y_cm} onChange={e => updateDeadZone(i, 'y_cm', parseFloat(e.target.value) || 0)} className="w-20 h-8" />
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Y (cm)</Label>
+              <Input type="number" value={zone.y_cm} onChange={e => updateDeadZone(i, 'y_cm', parseFloat(e.target.value) || 0)} className="w-20 h-9" />
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Width</Label>
-              <Input type="number" value={zone.width_cm} onChange={e => updateDeadZone(i, 'width_cm', parseFloat(e.target.value) || 0)} className="w-20 h-8" />
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Width</Label>
+              <Input type="number" value={zone.width_cm} onChange={e => updateDeadZone(i, 'width_cm', parseFloat(e.target.value) || 0)} className="w-20 h-9" />
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Height</Label>
-              <Input type="number" value={zone.height_cm} onChange={e => updateDeadZone(i, 'height_cm', parseFloat(e.target.value) || 0)} className="w-20 h-8" />
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Height</Label>
+              <Input type="number" value={zone.height_cm} onChange={e => updateDeadZone(i, 'height_cm', parseFloat(e.target.value) || 0)} className="w-20 h-9" />
             </div>
-            <div className="space-y-1 flex-1 min-w-[120px]">
-              <Label className="text-xs">Reason</Label>
-              <Input value={zone.reason} onChange={e => updateDeadZone(i, 'reason', e.target.value)} placeholder="e.g., Shower fixture" className="h-8" />
+            <div className="space-y-1.5 flex-1 min-w-[120px]">
+              <Label className="text-xs text-muted-foreground">Reason</Label>
+              <Input value={zone.reason} onChange={e => updateDeadZone(i, 'reason', e.target.value)} placeholder="e.g., Shower fixture" className="h-9" />
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 mb-0.5" onClick={() => removeDeadZone(i)}>
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full mb-0.5" onClick={() => removeDeadZone(i)}>
               <X className="h-3 w-3" />
             </Button>
           </div>
         ))}
       </div>
 
-      <Separator />
+      <div className="section-divider" />
 
       {/* DPI + Bleed */}
       <div className="flex gap-6">
-        <div className="space-y-1">
-          <Label className="text-xs">DPI Target</Label>
-          <Input type="number" value={dpiTarget} onChange={e => setDpiTarget(parseInt(e.target.value) || 200)} className="w-28 h-8" />
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">DPI Target</Label>
+          <Input type="number" value={dpiTarget} onChange={e => setDpiTarget(parseInt(e.target.value) || 200)} className="w-28 h-9" />
         </div>
-        <div className="space-y-1">
-          <Label className="text-xs">Bleed (mm)</Label>
-          <Input type="number" value={bleedMm} onChange={e => setBleedMm(parseFloat(e.target.value) || 0)} className="w-28 h-8" />
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Bleed (mm)</Label>
+          <Input type="number" value={bleedMm} onChange={e => setBleedMm(parseFloat(e.target.value) || 0)} className="w-28 h-9" />
         </div>
       </div>
 
       {/* Visual Preview */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Preview</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/[0.04]">
+          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Preview</h3>
+        </div>
+        <div className="p-6">
           <div className="flex items-end gap-0" style={{ height: height_cm * scale }}>
             {panels.map((panel, i) => {
               return (
                 <div
                   key={i}
-                  className="border border-border relative bg-muted/30"
+                  className="border border-white/[0.08] relative bg-white/[0.02] rounded-sm"
                   style={{
                     width: panel.width_cm * scale,
                     height: panel.height_cm * scale,
                     borderRight: i < panels.length - 1 ? '2px dashed hsl(var(--destructive))' : undefined,
                   }}
                 >
-                  <span className="absolute top-1 left-1 text-[10px] text-muted-foreground">
+                  <span className="absolute top-2 left-2 text-[10px] text-muted-foreground font-mono">
                     P{i + 1}: {panel.width_cm}x{panel.height_cm}
                   </span>
-                  {/* Dead zones within this panel */}
                   {deadZones.map((zone, zi) => {
                     const panelX = panels.slice(0, i).reduce((s, p) => s + p.width_cm, 0)
                     const zoneRelX = zone.x_cm - panelX
@@ -254,7 +262,7 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
                     return (
                       <div
                         key={zi}
-                        className="absolute bg-destructive/20 border border-destructive/50"
+                        className="absolute bg-destructive/15 border border-destructive/40 rounded-sm"
                         style={{
                           left: zoneRelX * scale,
                           bottom: zone.y_cm * scale,
@@ -270,17 +278,17 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
               )
             })}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <div className="flex gap-3 justify-between">
-        <Button onClick={handleSave} disabled={upsertSurface.isPending}>
+      <div className="flex gap-3 justify-between pt-4">
+        <Button size="lg" className="rounded-full h-11 px-6" onClick={handleSave} disabled={upsertSurface.isPending}>
           {upsertSurface.isPending ? 'Saving...' : existingSurface ? 'Update Surface' : 'Save Surface'}
         </Button>
         {existingSurface && (
           <Link href={`/project/${id}/compose`}>
-            <Button variant="outline">
-              Continue to Compose <ArrowRight className="h-4 w-4 ml-1" />
+            <Button variant="outline" size="lg" className="rounded-full h-11 px-6">
+              Continue to Compose <ArrowRight className="h-4 w-4 ml-1.5" />
             </Button>
           </Link>
         )}

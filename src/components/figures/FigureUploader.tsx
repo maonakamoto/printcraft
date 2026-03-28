@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { Upload } from 'lucide-react'
+import { Upload, CloudUpload } from 'lucide-react'
 import { useSupabaseUpload } from '@/hooks/useSupabaseUpload'
 import { useCreateFigure } from '@/hooks/useFigures'
 import { toast } from 'sonner'
@@ -46,19 +46,27 @@ export function FigureUploader({ projectId }: FigureUploaderProps) {
     <div
       {...getRootProps()}
       className={`
-        border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200
-        ${isDragActive ? 'border-primary bg-primary/5 scale-[1.01]' : 'border-border hover:border-primary/50'}
+        upload-zone group cursor-pointer p-12 text-center transition-all duration-300
+        ${isDragActive ? 'active' : ''}
         ${uploading ? 'opacity-50 cursor-wait' : ''}
       `}
     >
       <input {...getInputProps()} />
-      <Upload className="h-10 w-10 mx-auto mb-4 text-muted-foreground" />
-      <p className="text-base font-medium">
-        {uploading ? 'Uploading...' : isDragActive ? 'Drop photos here' : 'Drop photos or click to upload'}
-      </p>
-      <p className="text-sm text-muted-foreground mt-2">
-        PNG, JPG, WEBP — one photo per person or group
-      </p>
+      <div className="flex flex-col items-center">
+        <div className="h-16 w-16 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-5 group-hover:bg-white/[0.06] group-hover:border-white/[0.1] transition-all duration-300">
+          {isDragActive ? (
+            <CloudUpload className="h-7 w-7 text-primary animate-subtle-pulse" />
+          ) : (
+            <Upload className="h-7 w-7 text-muted-foreground group-hover:text-foreground/80 transition-colors" />
+          )}
+        </div>
+        <p className="text-base font-medium mb-1.5">
+          {uploading ? 'Uploading...' : isDragActive ? 'Drop photos here' : 'Drop photos or click to upload'}
+        </p>
+        <p className="text-sm text-muted-foreground">
+          PNG, JPG, WEBP — one photo per person or group
+        </p>
+      </div>
     </div>
   )
 }

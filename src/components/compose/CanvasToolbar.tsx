@@ -2,7 +2,6 @@
 
 import { useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 import { ArrowUp, ArrowDown, Download, ImagePlus } from 'lucide-react'
 import { useUpdateFigure } from '@/hooks/useFigures'
 import { toast } from 'sonner'
@@ -32,16 +31,13 @@ export function CanvasToolbar({ stageRef, selectedId, figures, projectId, onBack
     const stage = stageRef.current
     if (!stage) return
     try {
-      // Export at max quality — 4x gives ~3200x2400 from an 800px canvas
-      // For full print DPI, use the Export page (Phase 2)
       const dataUrl = stage.toDataURL({ pixelRatio: 4 })
       const link = document.createElement('a')
       link.download = `printcraft-composition.png`
       link.href = dataUrl
       link.click()
       toast.success('PNG exported (4x resolution)')
-    } catch (err) {
-      // Canvas size limit hit — fall back to 2x
+    } catch {
       try {
         const dataUrl = stageRef.current!.toDataURL({ pixelRatio: 2 })
         const link = document.createElement('a')
@@ -61,31 +57,32 @@ export function CanvasToolbar({ stageRef, selectedId, figures, projectId, onBack
   }
 
   return (
-    <div className="flex items-center gap-3 px-5 py-3 rounded-xl glass border border-white/[0.06] flex-wrap">
-      <Button variant="outline" size="sm" disabled={!selectedId} onClick={() => moveLayer('up')}>
-        <ArrowUp className="h-4 w-4 mr-1.5" /> Forward
+    <div className="flex items-center gap-2 px-5 py-3 rounded-2xl glass-strong border border-white/[0.06] flex-wrap">
+      <Button variant="outline" size="sm" className="rounded-full h-8" disabled={!selectedId} onClick={() => moveLayer('up')}>
+        <ArrowUp className="h-3.5 w-3.5 mr-1.5" /> Forward
       </Button>
-      <Button variant="outline" size="sm" disabled={!selectedId} onClick={() => moveLayer('down')}>
-        <ArrowDown className="h-4 w-4 mr-1.5" /> Back
+      <Button variant="outline" size="sm" className="rounded-full h-8" disabled={!selectedId} onClick={() => moveLayer('down')}>
+        <ArrowDown className="h-3.5 w-3.5 mr-1.5" /> Back
       </Button>
 
-      <Separator orientation="vertical" className="h-6" />
+      <div className="h-5 w-px bg-white/[0.08] mx-1" />
 
-      <Button variant="outline" size="sm" onClick={() => bgInputRef.current?.click()}>
-        <ImagePlus className="h-4 w-4 mr-1.5" /> Background
+      <Button variant="outline" size="sm" className="rounded-full h-8" onClick={() => bgInputRef.current?.click()}>
+        <ImagePlus className="h-3.5 w-3.5 mr-1.5" /> Background
       </Button>
       <input ref={bgInputRef} type="file" className="hidden" accept="image/*" onChange={handleBgFileChange} />
 
-      <Button variant="default" size="sm" onClick={handleExportPng}>
-        <Download className="h-4 w-4 mr-1.5" /> Export PNG
+      <Button variant="default" size="sm" className="rounded-full h-8" onClick={handleExportPng}>
+        <Download className="h-3.5 w-3.5 mr-1.5" /> Export PNG
       </Button>
 
-      <Separator orientation="vertical" className="h-6" />
-
       {selectedFigure && (
-        <span className="text-xs text-muted-foreground">
-          {selectedFigure.label ?? 'Unnamed figure'}
-        </span>
+        <>
+          <div className="h-5 w-px bg-white/[0.08] mx-1" />
+          <span className="text-xs text-muted-foreground">
+            {selectedFigure.label ?? 'Unnamed figure'}
+          </span>
+        </>
       )}
     </div>
   )

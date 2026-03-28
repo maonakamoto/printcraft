@@ -7,43 +7,45 @@ import { FigureUploader } from '@/components/figures/FigureUploader'
 import { FigureCard } from '@/components/figures/FigureCard'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { ArrowRight, Info } from 'lucide-react'
+import { ArrowRight, Lightbulb } from 'lucide-react'
 
 export default function FiguresPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const { data: figures, isLoading } = useFigures(id)
 
   return (
-    <div className="p-8 max-w-4xl mx-auto w-full space-y-8">
+    <div className="max-w-4xl mx-auto w-full px-6 sm:px-8 py-10 space-y-10 animate-in-page">
+      {/* Header */}
       <div>
-        <h2 className="text-2xl font-semibold tracking-tight">Figures</h2>
-        <p className="text-base text-muted-foreground mt-1">
+        <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">Figures</h2>
+        <p className="text-muted-foreground mt-2 text-lg font-light">
           Upload photos of the people for your artwork.
         </p>
       </div>
 
       <FigureUploader projectId={id} />
 
-      <Card className="border-primary/20 bg-primary/5">
-        <CardContent className="p-5 flex gap-4">
-          <Info className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-          <div className="space-y-2">
-            <p className="font-medium">How it works</p>
-            <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-              <li>Upload the original photo of each person or group</li>
-              <li>Choose an art style in the next step</li>
-              <li>Use an AI tool (Grok, Midjourney) to generate a styled version</li>
-              <li>Upload the styled version using the &quot;Upload styled&quot; button on each card</li>
-              <li>Compose all styled figures together on the canvas</li>
-            </ol>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Info callout */}
+      <div className="rounded-2xl border border-primary/15 bg-primary/[0.03] p-6 flex gap-4">
+        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+          <Lightbulb className="h-5 w-5 text-primary" />
+        </div>
+        <div className="space-y-3">
+          <p className="font-medium">How it works</p>
+          <ol className="list-decimal list-inside space-y-1.5 text-sm text-muted-foreground leading-relaxed">
+            <li>Upload the original photo of each person or group</li>
+            <li>Choose an art style in the next step</li>
+            <li>Use an AI tool (Grok, Midjourney) to generate a styled version</li>
+            <li>Upload the styled version using the &quot;Upload styled&quot; button on each card</li>
+            <li>Compose all styled figures together on the canvas</li>
+          </ol>
+        </div>
+      </div>
 
+      {/* Figures list */}
       {isLoading ? (
         <div className="space-y-4">
-          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-36 rounded-xl" />)}
+          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-40 rounded-2xl" />)}
         </div>
       ) : figures?.length ? (
         <div className="space-y-4">
@@ -52,15 +54,17 @@ export default function FiguresPage({ params }: { params: Promise<{ id: string }
           ))}
         </div>
       ) : (
-        <p className="text-base text-muted-foreground text-center py-6">
-          No figures yet. Drop photos above to get started.
-        </p>
+        <div className="text-center py-12">
+          <p className="text-muted-foreground text-lg font-light">
+            No figures yet. Drop photos above to get started.
+          </p>
+        </div>
       )}
 
       {figures && figures.length > 0 && (
-        <div className="flex justify-end pt-2">
+        <div className="flex justify-end pt-4">
           <Link href={`/project/${id}/style`}>
-            <Button>
+            <Button size="lg" className="rounded-full h-11 px-6">
               Continue to Style <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>

@@ -7,7 +7,6 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -34,48 +33,54 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-semibold tracking-tight">PrintCraft</CardTitle>
-          <p className="text-base text-muted-foreground mt-1">Create your account</p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleRegister} className="space-y-5">
+    <div className="flex flex-1 items-center justify-center p-6 hero-gradient relative">
+      <div className="absolute inset-0 bg-dots opacity-20" />
+      <div className="relative w-full max-w-md animate-slide-up">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-extralight tracking-tight mb-2">PrintCraft</h1>
+          <p className="text-muted-foreground">Create your account</p>
+        </div>
+
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8">
+          <form onSubmit={handleRegister} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm text-muted-foreground">Email</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
+                className="h-11 bg-transparent border-white/[0.08]"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-sm text-muted-foreground">Password</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
+                className="h-11 bg-transparent border-white/[0.08]"
                 minLength={6}
                 required
               />
             </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full h-10 text-base" disabled={loading}>
+            {error && (
+              <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">{error}</p>
+            )}
+            <Button type="submit" className="w-full h-11 text-base font-medium rounded-full" disabled={loading}>
               {loading ? 'Creating account...' : 'Create account'}
             </Button>
           </form>
-          <p className="text-sm text-center text-muted-foreground mt-4">
+          <p className="text-sm text-center text-muted-foreground mt-6">
             Already have an account?{' '}
             <Link href="/login" className="text-primary hover:underline">
               Sign in
             </Link>
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

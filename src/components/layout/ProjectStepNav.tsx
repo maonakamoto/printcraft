@@ -28,43 +28,63 @@ export function ProjectStepNav({ projectId }: { projectId: string }) {
   if (surface) completedSteps.add('surface')
   if (figures?.some(f => f.styled_url)) completedSteps.add('compose')
 
+  const activeIndex = STEPS.findIndex(s => pathname.endsWith(`/${s.href}`))
+
   return (
-    <nav className="border-b border-white/[0.06] bg-background">
-      <div className="flex items-center gap-2 px-8 py-3 overflow-x-auto">
+    <nav className="border-b border-white/[0.06] bg-background/80 backdrop-blur-xl">
+      <div className="flex items-center gap-3 px-6 sm:px-8 py-3 max-w-7xl mx-auto overflow-x-auto">
+        {/* Back button */}
         <Link
           href="/projects"
-          className="flex items-center gap-1.5 px-4 py-2 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-white/[0.04] transition-all mr-3"
+          className="flex items-center gap-1.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-white/[0.04] transition-all shrink-0"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span className="hidden sm:inline">{project?.name ?? 'Back'}</span>
+          <span className="hidden sm:inline max-w-32 truncate">{project?.name ?? 'Back'}</span>
         </Link>
 
-        <div className="h-6 w-px bg-white/[0.08] mr-3" />
+        <div className="h-5 w-px bg-white/[0.08] shrink-0" />
 
-        <div className="flex items-center gap-1 rounded-xl bg-white/[0.04] p-1">
-          {STEPS.map((step) => {
+        {/* Steps */}
+        <div className="flex items-center gap-0.5">
+          {STEPS.map((step, i) => {
             const href = `/project/${projectId}/${step.href}`
             const isActive = pathname.endsWith(`/${step.href}`)
             const isComplete = completedSteps.has(step.id)
+            const isPast = i < activeIndex
 
             return (
-              <Link
-                key={step.id}
-                href={href}
-                className={cn(
-                  'flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap',
-                  isActive
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
+              <div key={step.id} className="flex items-center">
+                {/* Connector line */}
+                {i > 0 && (
+                  <div
+                    className={cn(
+                      'step-connector mx-1 hidden sm:block',
+                      (isPast || (isComplete && i < activeIndex)) && 'completed'
+                    )}
+                  />
                 )}
-              >
-                {isComplete && !isActive ? (
-                  <Check className="h-4 w-4 text-primary" />
-                ) : (
-                  <step.icon className="h-4 w-4" />
-                )}
-                <span className="hidden sm:inline">{step.label}</span>
-              </Link>
+
+                <Link
+                  href={href}
+                  className={cn(
+                    'relative flex items-center gap-2 px-3 sm:px-4 py-2 text-sm font-medium rounded-full transition-all whitespace-nowrap',
+                    isActive
+                      ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
+                      : isComplete
+                        ? 'text-foreground/80 hover:text-foreground hover:bg-white/[0.04]'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
+                  )}
+                >
+                  {isComplete && !isActive ? (
+                    <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Check className="h-3 w-3 text-primary" />
+                    </div>
+                  ) : (
+                    <step.icon className="h-4 w-4" />
+                  )}
+                  <span className="hidden sm:inline">{step.label}</span>
+                </Link>
+              </div>
             )
           })}
         </div>
