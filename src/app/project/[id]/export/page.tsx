@@ -47,7 +47,7 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
   const totalCount = figures?.length ?? 0
 
   return (
-    <div className="max-w-4xl mx-auto w-full px-6 sm:px-8 py-10 space-y-10 animate-in-page">
+    <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 md:px-8 py-8 sm:py-10 space-y-8 sm:space-y-10 animate-in-page">
       <div>
         <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">Export</h2>
         <p className="text-muted-foreground mt-2 text-lg font-light">
@@ -79,7 +79,7 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
       {/* DPI Selection */}
       <div className="space-y-4">
         <Label className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Resolution</Label>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           {DPI_OPTIONS.map(opt => (
             <button
               key={opt.value}

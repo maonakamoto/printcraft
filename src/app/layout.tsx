@@ -16,8 +16,24 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "PrintCraft",
-  description: "Scene composer for physical art",
+  title: "PrintCraft — Scene Composer for Physical Art",
+  description: "Turn separate photos of real people into one unified artwork — printed on surfaces that matter.",
+  metadataBase: new URL("https://printcraft.app"),
+  openGraph: {
+    title: "PrintCraft — Scene Composer for Physical Art",
+    description: "Turn separate photos of real people into one unified artwork — printed on surfaces that matter.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "PrintCraft" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PrintCraft — Scene Composer for Physical Art",
+    description: "Turn separate photos of real people into one unified artwork — printed on surfaces that matter.",
+    images: ["/og-image.png"],
+  },
+  other: {
+    "theme-color": "#1a1a1a",
+  },
 }
 
 export default function RootLayout({

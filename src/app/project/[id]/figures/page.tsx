@@ -14,7 +14,7 @@ export default function FiguresPage({ params }: { params: Promise<{ id: string }
   const { data: figures, isLoading } = useFigures(id)
 
   return (
-    <div className="max-w-4xl mx-auto w-full px-6 sm:px-8 py-10 space-y-10 animate-in-page">
+    <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 md:px-8 py-8 sm:py-10 space-y-8 sm:space-y-10 animate-in-page">
       {/* Header */}
       <div>
         <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">Figures</h2>

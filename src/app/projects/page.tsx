@@ -26,7 +26,7 @@ export default function ProjectsPage() {
       {/* Hero header */}
       <div className="relative hero-gradient">
         <div className="absolute inset-0 bg-dots opacity-30" />
-        <div className="relative max-w-6xl mx-auto px-6 sm:px-8 pt-16 pb-12">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-12 sm:pt-16 pb-10 sm:pb-12">
           <div className="flex items-end justify-between gap-4">
             <div className="animate-slide-up">
               <h1 className="text-4xl sm:text-5xl font-extralight tracking-tight">
@@ -50,7 +50,7 @@ export default function ProjectsPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto px-6 sm:px-8 py-10 w-full animate-in-page">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-10 w-full animate-in-page">
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (

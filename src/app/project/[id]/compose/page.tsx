@@ -23,7 +23,7 @@ export default function ComposePage({ params }: { params: Promise<{ id: string }
 
   if (isLoading) {
     return (
-      <div className="p-6 sm:p-8 animate-in-page">
+      <div className="p-4 sm:p-6 md:p-8 animate-in-page">
         <Skeleton className="h-[500px] rounded-2xl" />
       </div>
     )
@@ -70,7 +70,7 @@ export default function ComposePage({ params }: { params: Promise<{ id: string }
   }
 
   return (
-    <div className="px-6 sm:px-8 py-8 space-y-6 animate-in-page">
+    <div className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 space-y-5 sm:space-y-6 animate-in-page">
       <div>
         <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">Compose</h2>
         <p className="text-muted-foreground mt-2 text-lg font-light">

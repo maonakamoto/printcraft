@@ -37,7 +37,7 @@ export default function NewProjectPage() {
 
   return (
     <AppShell>
-      <div className="max-w-xl mx-auto w-full px-6 sm:px-8 py-16 animate-in-page">
+      <div className="max-w-xl mx-auto w-full px-4 sm:px-6 md:px-8 py-10 sm:py-16 animate-in-page">
         <div className="mb-10">
           <h1 className="text-3xl sm:text-4xl font-extralight tracking-tight">New Project</h1>
           <p className="text-muted-foreground mt-2 text-lg font-light">

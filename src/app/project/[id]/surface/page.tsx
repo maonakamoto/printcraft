@@ -98,10 +98,10 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
   const scale = Math.min(500 / width_cm, 300 / height_cm, 2)
 
   return (
-    <div className="max-w-5xl mx-auto w-full px-6 sm:px-8 py-10 space-y-10 animate-in-page">
+    <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 md:px-8 py-8 sm:py-10 space-y-8 sm:space-y-10 animate-in-page">
       <div>
         <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">Surface</h2>
-        <p className="text-muted-foreground mt-2 text-lg font-light">
+        <p className="text-muted-foreground mt-2 text-base sm:text-lg font-light">
           Define the physical surface this artwork will be printed on
         </p>
       </div>
@@ -111,12 +111,12 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
         <Label className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4 block">
           Presets
         </Label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           {SURFACE_PRESETS.map(preset => (
             <button
               key={preset.id}
               className={cn(
-                'p-4 rounded-2xl border text-left transition-all duration-200 card-hover',
+                'p-3 sm:p-4 rounded-2xl border text-left transition-all duration-200 cursor-pointer card-hover',
                 selectedPreset === preset.id
                   ? 'border-primary bg-primary/5 ring-1 ring-primary/30 glow-selected'
                   : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]'
@@ -136,7 +136,7 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
       <div className="section-divider" />
 
       {/* Panels */}
-      <div className="space-y-5">
+      <div className="space-y-4 sm:space-y-5">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-medium text-lg">Panels</h3>
@@ -149,31 +149,35 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
           </Button>
         </div>
         {panels.map((panel, i) => (
-          <div key={i} className="flex items-end gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.04]">
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Width (cm)</Label>
-              <Input
-                type="number"
-                value={panel.width_cm}
-                onChange={e => updatePanel(i, 'width_cm', parseFloat(e.target.value) || 0)}
-                className="w-28 h-9"
-              />
+          <div key={i} className="flex flex-col sm:flex-row sm:items-end gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+            <div className="flex gap-3 flex-1">
+              <div className="space-y-1.5 flex-1 sm:flex-none">
+                <Label className="text-xs text-muted-foreground">Width (cm)</Label>
+                <Input
+                  type="number"
+                  value={panel.width_cm}
+                  onChange={e => updatePanel(i, 'width_cm', parseFloat(e.target.value) || 0)}
+                  className="sm:w-28 h-9"
+                />
+              </div>
+              <div className="space-y-1.5 flex-1 sm:flex-none">
+                <Label className="text-xs text-muted-foreground">Height (cm)</Label>
+                <Input
+                  type="number"
+                  value={panel.height_cm}
+                  onChange={e => updatePanel(i, 'height_cm', parseFloat(e.target.value) || 0)}
+                  className="sm:w-28 h-9"
+                />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Height (cm)</Label>
-              <Input
-                type="number"
-                value={panel.height_cm}
-                onChange={e => updatePanel(i, 'height_cm', parseFloat(e.target.value) || 0)}
-                className="w-28 h-9"
-              />
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="rounded-full">Panel {i + 1}</Badge>
+              {panels.length > 1 && (
+                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={() => removePanel(i)}>
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
             </div>
-            <Badge variant="outline" className="mb-1.5 rounded-full">Panel {i + 1}</Badge>
-            {panels.length > 1 && (
-              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full mb-0.5" onClick={() => removePanel(i)}>
-                <X className="h-3 w-3" />
-              </Button>
-            )}
           </div>
         ))}
       </div>
@@ -181,7 +185,7 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
       <div className="section-divider" />
 
       {/* Dead Zones */}
-      <div className="space-y-5">
+      <div className="space-y-4 sm:space-y-5">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-medium text-lg">Dead Zones</h3>
@@ -192,30 +196,34 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
           </Button>
         </div>
         {deadZones.map((zone, i) => (
-          <div key={i} className="flex items-end gap-2 flex-wrap p-4 rounded-xl bg-white/[0.02] border border-white/[0.04]">
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">X (cm)</Label>
-              <Input type="number" value={zone.x_cm} onChange={e => updateDeadZone(i, 'x_cm', parseFloat(e.target.value) || 0)} className="w-20 h-9" />
+          <div key={i} className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] space-y-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">X (cm)</Label>
+                <Input type="number" value={zone.x_cm} onChange={e => updateDeadZone(i, 'x_cm', parseFloat(e.target.value) || 0)} className="h-9" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Y (cm)</Label>
+                <Input type="number" value={zone.y_cm} onChange={e => updateDeadZone(i, 'y_cm', parseFloat(e.target.value) || 0)} className="h-9" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Width</Label>
+                <Input type="number" value={zone.width_cm} onChange={e => updateDeadZone(i, 'width_cm', parseFloat(e.target.value) || 0)} className="h-9" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Height</Label>
+                <Input type="number" value={zone.height_cm} onChange={e => updateDeadZone(i, 'height_cm', parseFloat(e.target.value) || 0)} className="h-9" />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Y (cm)</Label>
-              <Input type="number" value={zone.y_cm} onChange={e => updateDeadZone(i, 'y_cm', parseFloat(e.target.value) || 0)} className="w-20 h-9" />
+            <div className="flex gap-3 items-end">
+              <div className="space-y-1.5 flex-1">
+                <Label className="text-xs text-muted-foreground">Reason</Label>
+                <Input value={zone.reason} onChange={e => updateDeadZone(i, 'reason', e.target.value)} placeholder="e.g., Shower fixture" className="h-9" />
+              </div>
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full shrink-0" onClick={() => removeDeadZone(i)}>
+                <X className="h-3 w-3" />
+              </Button>
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Width</Label>
-              <Input type="number" value={zone.width_cm} onChange={e => updateDeadZone(i, 'width_cm', parseFloat(e.target.value) || 0)} className="w-20 h-9" />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Height</Label>
-              <Input type="number" value={zone.height_cm} onChange={e => updateDeadZone(i, 'height_cm', parseFloat(e.target.value) || 0)} className="w-20 h-9" />
-            </div>
-            <div className="space-y-1.5 flex-1 min-w-[120px]">
-              <Label className="text-xs text-muted-foreground">Reason</Label>
-              <Input value={zone.reason} onChange={e => updateDeadZone(i, 'reason', e.target.value)} placeholder="e.g., Shower fixture" className="h-9" />
-            </div>
-            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full mb-0.5" onClick={() => removeDeadZone(i)}>
-              <X className="h-3 w-3" />
-            </Button>
           </div>
         ))}
       </div>
@@ -223,23 +231,23 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
       <div className="section-divider" />
 
       {/* DPI + Bleed */}
-      <div className="flex gap-6">
-        <div className="space-y-1.5">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+        <div className="space-y-1.5 flex-1 sm:flex-none">
           <Label className="text-xs text-muted-foreground">DPI Target</Label>
-          <Input type="number" value={dpiTarget} onChange={e => setDpiTarget(parseInt(e.target.value) || 200)} className="w-28 h-9" />
+          <Input type="number" value={dpiTarget} onChange={e => setDpiTarget(parseInt(e.target.value) || 200)} className="sm:w-28 h-9" />
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 flex-1 sm:flex-none">
           <Label className="text-xs text-muted-foreground">Bleed (mm)</Label>
-          <Input type="number" value={bleedMm} onChange={e => setBleedMm(parseFloat(e.target.value) || 0)} className="w-28 h-9" />
+          <Input type="number" value={bleedMm} onChange={e => setBleedMm(parseFloat(e.target.value) || 0)} className="sm:w-28 h-9" />
         </div>
       </div>
 
       {/* Visual Preview */}
       <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
-        <div className="px-6 py-4 border-b border-white/[0.04]">
+        <div className="px-4 sm:px-6 py-4 border-b border-white/[0.04]">
           <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Preview</h3>
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6 overflow-x-auto">
           <div className="flex items-end gap-0" style={{ height: height_cm * scale }}>
             {panels.map((panel, i) => {
               return (
@@ -281,13 +289,13 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
         </div>
       </div>
 
-      <div className="flex gap-3 justify-between pt-4">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between pt-4">
         <Button size="lg" className="rounded-full h-11 px-6" onClick={handleSave} disabled={upsertSurface.isPending}>
           {upsertSurface.isPending ? 'Saving...' : existingSurface ? 'Update Surface' : 'Save Surface'}
         </Button>
         {existingSurface && (
           <Link href={`/project/${id}/compose`}>
-            <Button variant="outline" size="lg" className="rounded-full h-11 px-6">
+            <Button variant="outline" size="lg" className="rounded-full h-11 px-6 w-full sm:w-auto">
               Continue to Compose <ArrowRight className="h-4 w-4 ml-1.5" />
             </Button>
           </Link>

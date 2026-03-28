@@ -37,6 +37,16 @@ export function AppShell({ children }: { children: ReactNode }) {
     setMobileMenuOpen(false)
   }, [pathname])
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [mobileMenuOpen])
+
   async function handleLogout() {
     await supabase.auth.signOut()
     router.push('/login')
@@ -53,7 +63,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             : 'bg-transparent'
         )}
       >
-        <div className="flex h-14 items-center justify-between px-6 sm:px-8 max-w-7xl mx-auto w-full">
+        <div className="flex h-14 items-center justify-between px-4 sm:px-6 md:px-8 max-w-7xl mx-auto w-full">
           {/* Logo */}
           <Link
             href="/"
@@ -113,49 +123,73 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden h-8 w-8 p-0"
+              className="md:hidden h-10 w-10 p-0"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
 
         {/* Glow line */}
         <div className={cn('h-px glow-line transition-opacity duration-300', scrolled ? 'opacity-100' : 'opacity-0')} />
-
-        {/* Mobile menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden glass-strong border-t border-white/[0.06] animate-fade-in">
-            <div className="px-6 py-4 space-y-2">
-              {NAV_LINKS.map(link => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-white/[0.04] transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              {user ? (
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-white/[0.04] transition-colors"
-                >
-                  Sign out
-                </button>
-              ) : (
-                <Link
-                  href="/login"
-                  className="block px-4 py-3 text-sm font-medium text-primary hover:text-foreground rounded-lg hover:bg-white/[0.04] transition-colors"
-                >
-                  Sign in
-                </Link>
-              )}
-            </div>
-          </div>
-        )}
       </header>
+
+      {/* Full-screen mobile menu overlay */}
+      <div
+        className={cn(
+          'fixed inset-0 z-40 md:hidden transition-all duration-300',
+          mobileMenuOpen
+            ? 'opacity-100 pointer-events-auto'
+            : 'opacity-0 pointer-events-none'
+        )}
+      >
+        <div className="absolute inset-0 bg-background/95 backdrop-blur-xl" />
+        <div className="relative flex flex-col items-center justify-center h-full gap-2 px-6">
+          {NAV_LINKS.map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                'w-full max-w-sm text-center px-6 py-5 text-xl font-medium rounded-2xl transition-colors',
+                pathname === link.href
+                  ? 'text-foreground bg-white/[0.06]'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
+              )}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+
+          <div className="w-full max-w-sm h-px bg-white/[0.06] my-4" />
+
+          {user ? (
+            <>
+              <div className="flex items-center gap-3 px-6 py-4 text-muted-foreground">
+                <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                  <User className="h-4 w-4 text-primary" />
+                </div>
+                <span className="text-base">{user.email?.split('@')[0]}</span>
+              </div>
+              <button
+                onClick={() => { setMobileMenuOpen(false); handleLogout() }}
+                className="w-full max-w-sm text-center px-6 py-5 text-xl font-medium text-muted-foreground hover:text-foreground rounded-2xl hover:bg-white/[0.04] transition-colors"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="w-full max-w-sm text-center px-6 py-5 text-xl font-medium text-primary hover:text-foreground rounded-2xl hover:bg-white/[0.04] transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Sign in
+            </Link>
+          )}
+        </div>
+      </div>
 
       <main className="flex-1 flex flex-col">
         {children}

@@ -57,29 +57,33 @@ export function CanvasToolbar({ stageRef, selectedId, figures, projectId, onBack
   }
 
   return (
-    <div className="flex items-center gap-2 px-5 py-3 rounded-2xl glass-strong border border-white/[0.06] flex-wrap">
-      <Button variant="outline" size="sm" className="rounded-full h-8" disabled={!selectedId} onClick={() => moveLayer('up')}>
-        <ArrowUp className="h-3.5 w-3.5 mr-1.5" /> Forward
+    <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 rounded-2xl glass-strong border border-white/[0.06] shadow-xl shadow-black/20 flex-wrap justify-center">
+      <Button variant="outline" size="sm" className="rounded-full h-8 text-xs sm:text-sm" disabled={!selectedId} onClick={() => moveLayer('up')}>
+        <ArrowUp className="h-3.5 w-3.5 sm:mr-1.5" />
+        <span className="hidden sm:inline">Forward</span>
       </Button>
-      <Button variant="outline" size="sm" className="rounded-full h-8" disabled={!selectedId} onClick={() => moveLayer('down')}>
-        <ArrowDown className="h-3.5 w-3.5 mr-1.5" /> Back
+      <Button variant="outline" size="sm" className="rounded-full h-8 text-xs sm:text-sm" disabled={!selectedId} onClick={() => moveLayer('down')}>
+        <ArrowDown className="h-3.5 w-3.5 sm:mr-1.5" />
+        <span className="hidden sm:inline">Back</span>
       </Button>
 
-      <div className="h-5 w-px bg-white/[0.08] mx-1" />
+      <div className="h-5 w-px bg-white/[0.08] mx-0.5 sm:mx-1" />
 
-      <Button variant="outline" size="sm" className="rounded-full h-8" onClick={() => bgInputRef.current?.click()}>
-        <ImagePlus className="h-3.5 w-3.5 mr-1.5" /> Background
+      <Button variant="outline" size="sm" className="rounded-full h-8 text-xs sm:text-sm" onClick={() => bgInputRef.current?.click()}>
+        <ImagePlus className="h-3.5 w-3.5 sm:mr-1.5" />
+        <span className="hidden sm:inline">Background</span>
       </Button>
       <input ref={bgInputRef} type="file" className="hidden" accept="image/*" onChange={handleBgFileChange} />
 
-      <Button variant="default" size="sm" className="rounded-full h-8" onClick={handleExportPng}>
-        <Download className="h-3.5 w-3.5 mr-1.5" /> Export PNG
+      <Button variant="default" size="sm" className="rounded-full h-8 text-xs sm:text-sm" onClick={handleExportPng}>
+        <Download className="h-3.5 w-3.5 sm:mr-1.5" />
+        <span className="hidden sm:inline">Export PNG</span>
       </Button>
 
       {selectedFigure && (
         <>
-          <div className="h-5 w-px bg-white/[0.08] mx-1" />
-          <span className="text-xs text-muted-foreground">
+          <div className="h-5 w-px bg-white/[0.08] mx-0.5 sm:mx-1 hidden sm:block" />
+          <span className="text-xs text-muted-foreground hidden sm:inline">
             {selectedFigure.label ?? 'Unnamed figure'}
           </span>
         </>
