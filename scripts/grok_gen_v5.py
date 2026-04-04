@@ -1,250 +1,381 @@
 #!/usr/bin/env python3
 """
-Grok image generation v5 — simplified.
+Grok image generation v5 — for PrintCraft projects.
+
 Uses Playwright to automate grok.com image generation.
-Run with: python3 grok_gen_v5.py [start_index] [end_index]
-Defaults: all 7 scenes (0-6)
+Grok now uses a standard <textarea> — newlines work natively.
+
+Usage:
+  python3 grok_gen_v5.py test            # Dry run scene 0 (no submit)
+  python3 grok_gen_v5.py 0               # Generate scene 0
+  python3 grok_gen_v5.py 0 3             # Generate scenes 0-3
+  python3 grok_gen_v5.py all             # Generate all scenes
 """
 
 import sys
 import time
 import os
+import base64
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
-BASE = Path("/home/g/Dokumente/Duschwand")
-SOURCE = BASE / "00-source-photos"
-OUTPUT = BASE / "07-grok-v4-retro-poster"
+# --- Project paths ---
+PROJECT = Path("/home/g/dev/printcraft/projects/duschwand-roli")
+PHOTOS = PROJECT / "00-source-photos"
+OUTPUT = PROJECT / "08-grok-v5-final"
 
-PHOTOS = [
-    ("1.png", "bild1_hero_teal_bap670"),
-    ("2.png", "bild2_white_italian"),
-    ("3.png", "bild3_teal_kd"),
-    ("4.png", "bild4_blue_abn274"),
-    ("5.png", "bild5_hydrofoil_dog"),
-    ("6.png", "bild6_jetranger"),
-    ("7.png", "bild7_vw_van"),
-]
+# --- Style block (shared across all scenes for consistency) ---
+STYLE = """Style: 1960s ITALIAN TRAVEL POSTER illustration.
 
-PROMPT = """Transform this photo into a 1960s Italian travel poster illustration.
-
-STYLE — follow this EXACTLY for every image in the series:
+STYLE RULES (follow EXACTLY for every image):
 - Flat bold colors with subtle gradients, like vintage screen-printed posters
 - Strong black ink outlines on all subjects (people, vehicles, water edges)
 - Warm golden-hour palette: amber, coral, burnt orange sky — Lake Garda at sunset
-- Simplified but recognizable backgrounds: silhouette hills, cypress trees, terracotta rooftops
-- Water rendered as stylized horizontal bands of warm reflected color with white spray/wake
-- Overall mood: nostalgic, warm, glamorous — like a 1962 Italian tourism advertisement
+- Water as stylized horizontal bands of warm reflected color with white spray/wake
+- Overall mood: nostalgic, warm, glamorous — like a 1962 Italian tourism ad
 
-PEOPLE — highest priority:
-- Faces must be RECOGNIZABLE as the real people in the photo
-- Keep exact facial features, expressions, hair color/style, clothing, hats, sunglasses, accessories
+PEOPLE (highest priority):
+- Faces MUST be RECOGNIZABLE as the real people in the photo
+- Keep exact facial features, expressions, hair color/style, clothing, hats, sunglasses
 - Render faces with more detail than the rest — semi-realistic within the poster style
 
-VEHICLE — second priority:
-- This is an Amphicar 770 (or other vehicle as shown). Keep it EXACTLY as photographed
-- Preserve: body color, license plate text, chrome details, stripes, flags, tail fins, windshield shape
-- Render with glossy poster-style shading and chrome highlights
+VEHICLE:
+- Keep it EXACTLY as photographed: body color, license plate, chrome, stripes, flags
+- Glossy poster-style shading with chrome highlights
 
 COMPOSITION:
-- Keep the same pose, angle, and framing as the original photo
-- BLACK BACKGROUND above the waterline/horizon — this will be composited later
+- Same pose, angle, framing as original photo
+- BLACK BACKGROUND above waterline/horizon (for compositing)
 - No text, no titles, no watermarks
-- Leave generous space around the subject on all sides"""
+- Generous space around subject on all sides"""
+
+# --- Scene definitions ---
+SCENES = [
+    {
+        "name": "bild1_hero_teal_bap670",
+        "photo": "1.png",
+        "extra": "TEAL/TURQUOISE Amphicar 770, license plate B-AP 670. THREE people aboard. Gold chrome stripes, tail fins. This is the HERO image — center of the mural.",
+    },
+    {
+        "name": "bild2_white_italian",
+        "photo": "2.png",
+        "extra": "WHITE Amphicar 770 with red stripe accents and Italian flag. TWO people — one wears STRIPY PANTS (key detail, get this right!).",
+    },
+    {
+        "name": "bild3_teal_kd",
+        "photo": "3.png",
+        "extra": "Another Amphicar on the water. Recreate people and vehicle exactly as shown.",
+    },
+    {
+        "name": "bild4_blue_abn274",
+        "photo": "4.png",
+        "extra": "LIGHT BLUE/PASTEL BLUE Amphicar 770, license plate AB-N 274. TWO people in Titanic-like pose (arms spread).",
+    },
+    {
+        "name": "bild5_hydrofoil_dog",
+        "photo": "5.png",
+        "extra": "Person on HYDROFOIL BOARD with GOLDEN RETRIEVER DOG. Dynamic water spray, foil above surface. Dog should be cute and cartoonish.",
+    },
+    {
+        "name": "bild6_jetranger",
+        "photo": "6.png",
+        "extra": 'BLUE amphibious vehicle/truck with "66568 JETRANGER" text and DUTCH FLAG. Man with ARMS SPREAD WIDE, passengers aboard.',
+    },
+    {
+        "name": "bild7_vw_van",
+        "photo": "7.png",
+        "extra": "WHITE amphibious VW-type van. WOMAN ON ROOF in chair, couple inside. Stylized wake and reflections.",
+    },
+]
 
 
-def run(start=0, end=6):
-    with sync_playwright() as p:
-        browser = p.chromium.connect_over_cdp("http://localhost:9222")
-        context = browser.contexts[0]
-        print(f"Connected. Processing scenes {start}-{end}\n")
+def build_prompt(scene):
+    return f"""Turn this photo into a retro cartoon illustration for a large-format print mural.
 
-        for idx in range(start, end + 1):
-            photo_file, output_name = PHOTOS[idx]
-            photo_path = str(SOURCE / photo_file)
-            print(f"{'='*60}")
-            print(f"[{idx+1}/7] {output_name}")
-            print(f"{'='*60}")
+{STYLE}
 
-            # Open new Grok conversation
-            page = context.new_page()
-            page.goto("https://grok.com/", wait_until="networkidle", timeout=30000)
-            time.sleep(3)
+SPECIFIC SCENE:
+{scene['extra']}"""
 
-            # Find input and upload photo
+
+def generate_scene(context, scene, dry_run=False):
+    """Generate one scene. Returns True on success."""
+    name = scene["name"]
+    photo_path = str(PHOTOS / scene["photo"])
+    prompt = build_prompt(scene)
+
+    print(f"\n{'='*60}")
+    print(f"  {name}")
+    print(f"{'='*60}")
+
+    page = context.new_page()
+    page.goto("https://grok.com/", wait_until="domcontentloaded", timeout=30000)
+    # Wait for React app to render the textarea
+    try:
+        page.wait_for_selector("textarea", timeout=20000)
+    except:
+        time.sleep(10)  # extra fallback wait
+    time.sleep(2)
+
+    # 1. Upload photo
+    file_input = page.query_selector('input[type="file"]')
+    if not file_input:
+        print("  ERROR: No file input found")
+        page.screenshot(path=str(OUTPUT / f"debug_{name}_nofile.png"))
+        page.close()
+        return False
+
+    if not os.path.exists(photo_path):
+        print(f"  ERROR: Photo not found: {photo_path}")
+        page.close()
+        return False
+
+    file_input.set_input_files(photo_path)
+    time.sleep(3)
+    print(f"  Photo uploaded")
+
+    # 2. Enter prompt — textarea supports newlines natively
+    #    After file upload, textarea may not be visible until we click the input area
+    textarea = None
+    for attempt in range(5):
+        textarea = page.query_selector("textarea")
+        if textarea and textarea.is_visible():
+            break
+        # Try clicking the placeholder / input area to activate it
+        placeholder = page.query_selector('[placeholder]') or page.query_selector('[data-placeholder]')
+        if placeholder:
             try:
-                # Look for file input
-                file_inputs = page.query_selector_all('input[type="file"]')
-                if file_inputs:
-                    file_inputs[0].set_input_files(photo_path)
-                    print("  Photo uploaded via file input")
-                    time.sleep(2)
-                else:
-                    print("  ERROR: No file input found!")
-                    page.close()
-                    continue
-            except Exception as e:
-                print(f"  Upload error: {e}")
-                page.close()
-                continue
-
-            # Enter prompt via clipboard paste (keyboard.type sends Enter on newlines!)
+                placeholder.click(timeout=3000)
+            except:
+                pass
+        # Also try clicking in the general input area
+        input_area = page.query_selector('div:has(> textarea)')
+        if input_area:
             try:
-                editor = page.query_selector('div[contenteditable="true"]') or \
-                         page.query_selector('[data-placeholder]') or \
-                         page.query_selector('textarea')
-                if not editor:
-                    print("  ERROR: No input found!")
-                    page.close()
-                    continue
-                editor.click()
-                time.sleep(0.5)
-                # Use evaluate to set clipboard and paste — avoids newline=Enter problem
-                page.evaluate("""(text) => {
-                    const dt = new DataTransfer();
-                    dt.setData('text/plain', text);
-                    const el = document.querySelector('div[contenteditable="true"]') ||
-                               document.querySelector('textarea');
-                    if (el) {
-                        el.focus();
-                        const event = new ClipboardEvent('paste', {
-                            clipboardData: dt,
-                            bubbles: true,
-                            cancelable: true
-                        });
-                        el.dispatchEvent(event);
-                    }
-                }""", PROMPT)
-                time.sleep(1)
-                # Verify text was inserted — if not, fall back to fill()
-                content = editor.inner_text().strip() if editor.inner_text else ""
-                if len(content) < 50:
-                    print("  Paste didn't work, trying fill()...")
-                    # For textarea
-                    ta = page.query_selector('textarea')
-                    if ta:
-                        ta.fill(PROMPT)
-                    else:
-                        # Last resort: set innerHTML for contenteditable
-                        escaped = PROMPT.replace('\\', '\\\\').replace('`', '\\`').replace('$', '\\$')
-                        page.evaluate(f"""() => {{
-                            const el = document.querySelector('div[contenteditable="true"]');
-                            if (el) {{
-                                el.innerText = `{escaped}`;
-                                el.dispatchEvent(new Event('input', {{bubbles: true}}));
-                            }}
-                        }}""")
-                    time.sleep(1)
-                print("  Prompt entered")
-                time.sleep(1)
-            except Exception as e:
-                print(f"  Prompt error: {e}")
-                page.close()
-                continue
+                input_area.click(timeout=3000)
+            except:
+                pass
+        time.sleep(2)
+    if not textarea or not textarea.is_visible():
+        # Last resort: use JS to make textarea visible and focus it
+        page.evaluate("""() => {
+            const ta = document.querySelector('textarea');
+            if (ta) {
+                ta.style.display = 'block';
+                ta.style.visibility = 'visible';
+                ta.focus();
+            }
+        }""")
+        time.sleep(1)
+        textarea = page.query_selector("textarea")
+    if not textarea:
+        print("  ERROR: No textarea found at all")
+        page.screenshot(path=str(OUTPUT / f"debug_{name}_nota.png"))
+        page.close()
+        return False
 
-            # Submit — find and click the send button explicitly
-            try:
-                send_btn = None
-                # Try multiple selectors for the send/submit button
-                for sel in [
-                    'button[aria-label="Submit"]',
-                    'button[aria-label="Send"]',
-                    'button[data-testid="send-button"]',
-                    'button[type="submit"]',
-                ]:
-                    send_btn = page.query_selector(sel)
-                    if send_btn:
-                        break
-                if not send_btn:
-                    # Try finding button near the input area
-                    buttons = page.query_selector_all('button')
-                    for b in buttons:
-                        aria = b.get_attribute('aria-label') or ''
-                        if any(w in aria.lower() for w in ['send', 'submit', 'go']):
-                            send_btn = b
-                            break
-                if send_btn:
-                    send_btn.click()
-                    print("  Submitted via button")
-                else:
-                    # Absolute last resort
-                    page.keyboard.press("Control+Enter")
-                    print("  Submitted via Ctrl+Enter")
-                time.sleep(5)
-            except Exception as e:
-                print(f"  Submit error: {e}")
+    try:
+        textarea.click(timeout=5000)
+    except:
+        textarea.focus()
+    time.sleep(0.3)
+    textarea.fill(prompt)
+    time.sleep(0.5)
 
-            # Wait for generated image (up to 3 minutes)
-            found_images = []
-            for wait in range(18):  # 18 * 10s = 180s max
-                time.sleep(10)
-                elapsed = (wait + 1) * 10 + 5
-                
-                # Look for grok asset images
-                imgs = page.query_selector_all('img[src*="assets.grok.com"]')
-                new_imgs = []
-                for img in imgs:
-                    src = img.get_attribute("src") or ""
-                    if "generated" in src and src not in [x[0] for x in found_images]:
-                        w = img.evaluate("el => el.naturalWidth") or 0
-                        h = img.evaluate("el => el.naturalHeight") or 0
-                        if w > 200:
-                            new_imgs.append((src, w, h))
+    # Verify
+    value = textarea.input_value()
+    if len(value.strip()) < 50:
+        print(f"  WARNING: fill() got {len(value)} chars, retrying with JS...")
+        page.evaluate("""(text) => {
+            const ta = document.querySelector('textarea');
+            const nativeSetter = Object.getOwnPropertyDescriptor(
+                window.HTMLTextAreaElement.prototype, 'value'
+            ).set;
+            nativeSetter.call(ta, text);
+            ta.dispatchEvent(new Event('input', { bubbles: true }));
+        }""", prompt)
+        time.sleep(0.5)
 
-                if new_imgs:
-                    found_images.extend(new_imgs)
-                    print(f"  Found {len(new_imgs)} image(s) at {elapsed}s")
-                    # Wait a bit more for potential second image
-                    time.sleep(10)
-                    # Check again
-                    imgs2 = page.query_selector_all('img[src*="assets.grok.com"]')
-                    for img in imgs2:
-                        src = img.get_attribute("src") or ""
-                        if "generated" in src and src not in [x[0] for x in found_images]:
-                            w = img.evaluate("el => el.naturalWidth") or 0
-                            h = img.evaluate("el => el.naturalHeight") or 0
-                            if w > 200:
-                                found_images.append((src, w, h))
-                    break
-                else:
-                    print(f"  Waiting... ({elapsed}s)")
+    print(f"  Prompt entered ({len(prompt)} chars, {prompt.count(chr(10))} lines)")
 
-            if not found_images:
-                print(f"  FAIL: No images found after 3 minutes")
-                page.screenshot(path=str(OUTPUT / f"{output_name}_FAIL.png"))
-                page.close()
-                continue
+    if dry_run:
+        page.screenshot(path=str(OUTPUT / f"test_{name}.png"))
+        print(f"  DRY RUN — screenshot saved")
+        page.close()
+        return True
 
-            # Download images
-            for i, (src, w, h) in enumerate(found_images):
-                suffix = "" if i == 0 else f"_alt{i}"
-                out_path = OUTPUT / f"{output_name}{suffix}.jpg"
+    # Record pre-existing image URLs (uploaded photo) to exclude from results
+    pre_existing = set()
+    for img in page.query_selector_all("img"):
+        src = img.get_attribute("src") or ""
+        if "assets.grok.com" in src:
+            pre_existing.add(src)
+
+    # 3. Submit — use JS to click the hidden submit button
+    textarea.focus()
+    time.sleep(0.5)
+    result = page.evaluate("""() => {
+        for (const label of ['Absenden', 'Submit', 'Send', 'Senden']) {
+            const btn = document.querySelector(`button[aria-label="${label}"]`);
+            if (btn) { btn.click(); return label; }
+        }
+        // Fallback: find any submit-like button
+        const btns = document.querySelectorAll('button');
+        for (const b of btns) {
+            const svg = b.querySelector('svg');
+            if (svg && b.closest('form, [class*="input"], [class*="chat"]')) {
+                b.click();
+                return 'svg-button';
+            }
+        }
+        return null;
+    }""")
+    if result:
+        print(f"  Submitted via '{result}' button")
+    else:
+        textarea.press("Enter")
+        print("  Submitted via Enter key (fallback)")
+
+    # 4. Wait for generated images (up to 3 min)
+    found = []
+    for tick in range(36):
+        time.sleep(5)
+        elapsed = (tick + 1) * 5
+
+        for img in page.query_selector_all("img"):
+            src = img.get_attribute("src") or ""
+            if "assets.grok.com" in src and ("/generated/" in src or "/content" in src) and src not in found and src not in pre_existing:
                 try:
-                    response = page.request.get(src)
-                    if response.ok:
-                        out_path.write_bytes(response.body())
-                        size_kb = len(response.body()) // 1024
-                        print(f"  SAVED: {out_path.name} ({w}x{h}, {size_kb}KB)")
-                    else:
-                        print(f"  Download failed: HTTP {response.status}")
+                    w = img.evaluate("el => el.naturalWidth") or 0
+                    h = img.evaluate("el => el.naturalHeight") or 0
+                    if w > 100:
+                        found.append(src)
+                        print(f"  Image found: {w}x{h} at {elapsed}s")
+                except:
+                    found.append(src)
+                    print(f"  Image found at {elapsed}s")
+
+        if found and tick > 6:
+            time.sleep(5)  # grace period for additional images
+            for img in page.query_selector_all("img"):
+                src = img.get_attribute("src") or ""
+                if "assets.grok.com" in src and ("/generated/" in src or "/content" in src) and src not in found and src not in pre_existing:
+                    found.append(src)
+            break
+
+        if tick > 0 and tick % 6 == 0:
+            print(f"  Waiting... ({elapsed}s)")
+            # Check for rate limit message
+            try:
+                body_text = page.inner_text("body")
+                if "Limit" in body_text and ("zurückgesetzt" in body_text or "reset" in body_text.lower()):
+                    print(f"  RATE LIMITED: {[l for l in body_text.split(chr(10)) if 'Limit' in l or 'limit' in l][0]}")
+                    page.screenshot(path=str(OUTPUT / f"debug_{name}_ratelimit.png"))
+                    page.close()
+                    return False
+            except:
+                pass
+
+    if not found:
+        print(f"  FAIL: No images after 5 min")
+        # Log what Grok actually responded with
+        try:
+            text = page.inner_text("body")[:1000]
+            print(f"  Page text: {text[:300]}")
+        except:
+            pass
+        page.screenshot(path=str(OUTPUT / f"debug_{name}_timeout.png"), full_page=True)
+        page.close()
+        return False
+
+    # 5. Download
+    for i, src in enumerate(found):
+        suffix = "" if i == 0 else f"_alt{i}"
+        out_path = OUTPUT / f"{name}{suffix}.jpg"
+        try:
+            # Download via page fetch (includes cookies/auth)
+            b64_data = page.evaluate("""async (url) => {
+                const resp = await fetch(url, { credentials: 'include' });
+                if (!resp.ok) return null;
+                const blob = await resp.blob();
+                return new Promise(r => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => r(reader.result);
+                    reader.readAsDataURL(blob);
+                });
+            }""", src)
+            if b64_data and b64_data.startswith("data:"):
+                raw = base64.b64decode(b64_data.split(",", 1)[1])
+                out_path.write_bytes(raw)
+                print(f"  SAVED: {out_path.name} ({len(raw)//1024}KB)")
+            else:
+                print(f"  Download returned empty for {src[:60]}")
+        except Exception as e:
+            print(f"  Download error: {e}")
+            (OUTPUT / f"{name}{suffix}_url.txt").write_text(src)
+            print(f"  URL saved instead")
+
+    page.close()
+    return True
+
+
+def main():
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    mode = sys.argv[1] if len(sys.argv) > 1 else "test"
+
+    with sync_playwright() as p:
+        # Try existing Chrome first
+        browser = None
+        for port in [9222, 9333, 40967]:
+            try:
+                browser = p.chromium.connect_over_cdp(f"http://127.0.0.1:{port}")
+                print(f"Connected to Chrome on port {port}")
+                break
+            except:
+                continue
+
+        if browser:
+            context = browser.contexts[0]
+        else:
+            print("No Chrome found — launching new browser (persistent profile)")
+            context = p.chromium.launch_persistent_context(
+                user_data_dir=str(Path.home() / ".cache" / "printcraft-chrome"),
+                headless=False,
+                args=["--no-sandbox"],
+            )
+
+        if mode == "test":
+            generate_scene(context, SCENES[0], dry_run=True)
+        elif mode == "all":
+            results = {}
+            for scene in SCENES:
+                ok = generate_scene(context, scene)
+                results[scene["name"]] = "OK" if ok else "FAIL"
+                time.sleep(3)
+            print(f"\n{'='*60}")
+            print("RESULTS:")
+            for k, v in results.items():
+                print(f"  {k}: {v}")
+        else:
+            start = int(mode)
+            end = int(sys.argv[2]) if len(sys.argv) > 2 else start
+            results = {}
+            for i in range(start, end + 1):
+                try:
+                    ok = generate_scene(context, SCENES[i])
+                    results[SCENES[i]["name"]] = "OK" if ok else "FAIL"
                 except Exception as e:
-                    # Fallback: screenshot the image element
-                    print(f"  Download error: {e}, trying screenshot...")
-                    for img in page.query_selector_all('img[src*="assets.grok.com"]'):
-                        if img.get_attribute("src") == src:
-                            img.screenshot(path=str(out_path))
-                            print(f"  SAVED (screenshot): {out_path.name}")
-                            break
+                    print(f"  CRASH: {e}")
+                    results[SCENES[i]["name"]] = "CRASH"
+                time.sleep(3)
+            print(f"\n{'='*60}")
+            print("RESULTS:")
+            for k, v in results.items():
+                print(f"  {k}: {v}")
 
-            page.close()
-            time.sleep(2)
-
-        print(f"\n{'='*60}")
-        print("DONE!")
-        print(f"{'='*60}")
+        if not browser:
+            context.close()
 
 
 if __name__ == "__main__":
-    start = int(sys.argv[1]) if len(sys.argv) > 1 else 0
-    end = int(sys.argv[2]) if len(sys.argv) > 2 else 6
-    run(start, end)
+    main()
