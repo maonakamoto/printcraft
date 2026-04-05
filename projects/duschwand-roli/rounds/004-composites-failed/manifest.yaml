@@ -1,0 +1,14 @@
+round: 004
+name: composites-failed
+date: 2026-04-01
+status: failed
+outcome: abandoned-approach
+summary: |
+  Attempted to composite the round-003 cartoon scenes onto a unified sunset
+  background using Pillow/GIMP. Result looked like a collage — scale mismatch,
+  jarring waterline seams, no shared perspective.
+learnings:
+  - Compositing individually-generated scenes doesn't work — seams are unavoidable
+  - The only viable path is either (a) unified scene generation, or
+    (b) scene + background generated from the same prompt tree
+next_step: Abandon compositing. Use unified mural generation (round 007).

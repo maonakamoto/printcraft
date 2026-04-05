@@ -1,0 +1,24 @@
+round: 006
+name: scene-finals
+date: 2026-04-03
+model: grok-aurora
+status: complete
+outcome: success
+summary: |
+  All 7 individual scenes generated in consistent retro poster style.
+  Each scene: one source photo + short prompt, outputs upscaled to ~1200px wide.
+  These are kept as reference/alternates but NOT the final deliverable —
+  compositing them is known not to work (see round 004).
+selected:
+  - outputs/bild1_hero_teal_bap670.jpg
+  - outputs/bild2_white_italian_alt1.jpg
+  - outputs/bild3_teal_kd.jpg
+  - outputs/bild4_blue_abn274_alt1.jpg
+  - outputs/bild5_sg_alt1.jpg
+  - outputs/bild6_sg.jpg
+  - outputs/bild7_sg_alt1.jpg
+learnings:
+  - SuperGrok produces photorealistic photo-edits with LONG prompts — keep prompts short
+  - `page.keyboard.type()` triggers React state correctly; JS native setter does not
+  - Free tier ~3 gens/2h; SuperGrok unlimited with short-prompt approach
+next_step: Round 007 — unified mural generation (one image, no compositing)

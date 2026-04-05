@@ -1,0 +1,15 @@
+round: 003
+name: cartoon
+date: 2026-03-31
+model: grok-aurora
+status: superseded
+outcome: good-individual-bad-composite
+summary: |
+  Retro cartoon style. Best consistency so far — 8-9/10 retro feel across scenes.
+  Individual images looked great. Compositing onto a photographic background
+  failed (collage effect).
+learnings:
+  - Cartoon foreground + photo background = broken look
+  - Each scene needs a consistent unified background OR single-shot generation
+  - Bold black outlines + flat colors is the right direction
+next_step: Try retro travel poster direction; explore unified scene generation

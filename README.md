@@ -1,71 +1,97 @@
 # PrintCraft
 
-Custom artwork for physical surfaces — shower walls, canvases, tile murals. AI-generated scenes with recognizable faces, composed to exact print dimensions.
+Custom artwork generation for physical print surfaces — shower walls, canvases,
+tile murals. AI-generated illustrations with recognizable faces, composed to
+exact print dimensions.
 
-## How It Works
+## Quick start
 
-1. **Brief** — Client wants artwork on a physical surface. Define dimensions, scene, characters.
-2. **Generate** — Create styled illustrations of each character/vehicle using AI (Grok, Midjourney, Flux)
-3. **Composite** — Assemble individual elements into a unified scene at print resolution
-4. **Deliver** — Export print-ready file, send to print shop
+```bash
+# Install the CLI (editable install)
+pip install -e .
 
-## Structure
+# Inspect a project
+printcraft project info projects/duschwand-roli
+printcraft project list-scenes projects/duschwand-roli
+
+# Generate a single scene (writes to rounds/YYYY-MM-DD-adhoc/)
+printcraft generate scene projects/duschwand-roli hero
+
+# Generate every scene in the project
+printcraft generate all-scenes projects/duschwand-roli --round 2026-04-retro
+```
+
+## Repository layout
 
 ```
 printcraft/
-├── app/                    # Next.js web app (composition editor)
-├── projects/               # Client projects
-│   └── duschwand-roli/     # Each project is self-contained
-│       ├── BRIEF.md        # Client requirements, dimensions, scene description
-│       ├── 00-source-photos/   # Real photos of people/vehicles
-│       ├── 01-reference-art/   # Style references, previous attempts
-│       ├── 02-grok-v1-*/       # Generation rounds (numbered by attempt)
-│       ├── ...
-│       ├── 05-composites/      # Assembled scenes
-│       └── final/              # Print-ready exports
-├── scripts/                # Reusable automation (Grok generation, compositing)
-├── docs/                   # Process docs, learnings (carry forward between projects)
-└── templates/              # Project templates for new clients
+├── printcraft/           # Python package — the library
+│   ├── project.py        # Loads project.yaml, typed access to everything
+│   ├── generators/       # AI backends
+│   │   └── grok.py       # Grok via Playwright (the only one so far)
+│   ├── compositor/       # (planned) Mask, layout, export
+│   └── cli.py            # Typer CLI entry point
+├── projects/             # Client projects (each is self-contained)
+│   └── duschwand-roli/   # Roli's shower wall mural
+├── app/                  # Next.js web app (composition editor, in progress)
+├── docs/
+│   ├── PROCESS.md        # High-level workflow
+│   └── LEARNINGS.md      # Hard-won findings — READ BEFORE CODING
+├── templates/project/    # Template for starting a new client
+├── _archive/             # Old scripts, kept for reference
+├── pyproject.toml
+└── README.md
 ```
 
-## Starting a New Project
+## Project layout
 
-1. Copy `templates/project/` to `projects/<name>/`
-2. Fill in `BRIEF.md` — dimensions, scene, characters, style
-3. Add source photos to `00-source-photos/`
-4. Generate, iterate, composite, deliver
+Every client project is a self-contained directory with a single source of truth
+(`project.yaml`) plus numbered generation rounds:
 
-## Active Projects
+```
+projects/<client-name>/
+├── project.yaml          # SSOT — dimensions, scenes, characters, style
+├── source/               # Immutable inputs
+│   ├── photos/
+│   ├── references/
+│   └── docs/
+├── rounds/               # Generation iterations
+│   └── 00N-name/
+│       ├── manifest.yaml # Date, model, outcome, learnings
+│       ├── prompts/
+│       ├── outputs/
+│       └── notes.md
+├── selected/             # Curated best-of (symlinks into rounds/)
+│   ├── scenes/
+│   └── murals/
+├── composites/
+└── deliverables/         # Print-ready files
+```
+
+## Starting a new client
+
+```bash
+cp -r templates/project projects/new-client
+# Edit projects/new-client/project.yaml
+# Drop photos into projects/new-client/source/photos/
+printcraft project info projects/new-client      # sanity check
+printcraft generate all-scenes projects/new-client
+```
+
+## Active projects
 
 ### Duschwand Roli
-Cartoon mural for shower wall on houseboat (River Queen K 2070).
-- **Surface:** 2-panel L-corner glass (80 + 120 cm × 200 cm)
-- **Scene:** 7 Amphicar 770 owners cruising Lake Garda at golden sunset
-- **Style:** Retro 1960s travel poster / cartoon illustration
-- **Status:** 4 style rounds complete (v1 initial → v4 retro poster). Compositing next.
-- **Details:** [projects/duschwand-roli/BRIEF.md](projects/duschwand-roli/BRIEF.md)
+Cartoon mural for a 2-panel L-corner shower wall (80 + 120 × 200 cm) on a houseboat.
+Seven Amphicar owners cruising Lake Garda at sunset in 1960s travel-poster style.
+- **Status:** Round 007 (unified mural) in progress
+- **Details:** [projects/duschwand-roli/project.yaml](projects/duschwand-roli/project.yaml)
 
-## AI Tools for Face-Preserving Generation
+## Hard-won findings
 
-| Tool | Face Likeness | Quality | Cost | Notes |
-|------|--------------|---------|------|-------|
-| Grok (xAI Aurora) | Good | Good | Free | Best free option. Browser automation needed. |
-| Midjourney --cref | Good | Excellent | $10/mo | Character reference feature |
-| Flux Pro + face swap | Very good | Excellent | ~$0.05/img | Via Replicate API |
-| DALL-E | Poor | Good scenes | $0.04/img | EU filters block face likeness |
-
-## Key Learnings
-
-See [docs/PROCESS.md](docs/PROCESS.md) for detailed notes. Headlines:
-- ChatGPT/DALL-E won't reproduce real faces (EU safety filters)
-- Grok is best free option for face likeness but requires browser automation
-- Grok's chat input (ProseMirror) sends on Enter — use Shift+Enter or clipboard paste for multi-line prompts
-- Print minimum: 150 DPI at viewing distance. Target 200+ DPI when possible.
-- Always generate with black/transparent background for easy compositing
-
-## Tech Stack
-
-- **App:** Next.js 16 + TypeScript + Tailwind + Konva.js
-- **Scripts:** Python + Playwright (browser automation for Grok)
-- **Compositing:** Python (Pillow) / GIMP scripts
-- **Deploy:** Vercel
+Read [docs/LEARNINGS.md](docs/LEARNINGS.md) before touching generation code.
+Key rules:
+- **Short prompts only** (~600 chars max). Long prompts trigger Grok's
+  photo-edit mode instead of Aurora illustration generation.
+- **`page.keyboard.type()`** for prompt entry, never `fill()` or JS setters.
+- **Don't composite individually-generated scenes** — use unified generation.
+- **One project.yaml per project** — never hard-code scene data in scripts.

@@ -1,6 +1,10 @@
 # Dependencies
 node_modules/
 .next/
+*.egg-info/
+__pycache__/
+*.pyc
+.pytest_cache/
 
 # Environment
 .env
@@ -15,18 +19,15 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Large image files — keep local, don't push to git
-# Source photos and reference art are tracked (small, critical)
-# Generation rounds and composites are excluded (large, reproducible)
-projects/*/02-*
-projects/*/03-*
-projects/*/04-*
-projects/*/05-*
-projects/*/06-*
-projects/*/07-*
-projects/*/08-*
-projects/*/09-*
-projects/*/final/
+# Project outputs — keep local, don't push to git
+# Source materials ARE tracked (source/photos, source/references, source/docs)
+# manifest.yaml, prompts/, notes.md in each round ARE tracked
+# Generated images in rounds/*/outputs/ are NOT tracked (large, reproducible)
+# selected/ symlinks ARE tracked (small, documents the curation)
+# composites/ and deliverables/ are NOT tracked (large)
+projects/*/rounds/*/outputs/
+projects/*/composites/
+projects/*/deliverables/
 
 # Debug artifacts
 *.log

@@ -1,0 +1,112 @@
+# PrintCraft project manifest — single source of truth for duschwand-roli
+# Everything else (prompts, rounds, compositing) derives from this file.
+
+client: Roli
+title: Duschwand Mural
+status: in-progress
+created: 2026-03-25
+
+# Physical surface being printed on
+surface:
+  name: shower-wall-corner
+  dpi: 150
+  panels:
+    - id: left
+      width_cm: 80
+      height_cm: 200
+    - id: right
+      width_cm: 120
+      height_cm: 200
+  # Total unwrapped: 200 × 200 cm → 11,811 × 11,811 px at 150 DPI
+  mounting: L-corner (two glass panels forming a right angle)
+  material: glass (waterproof print)
+
+# Art direction (used in every generation prompt)
+style:
+  name: retro-italian-poster-1960s
+  prompt: |
+    Style: 1960s Italian travel poster illustration. Bold black ink outlines,
+    flat cel-shaded colors, warm golden-hour palette (amber, coral, burnt
+    orange), stylized water as horizontal color bands. Nostalgic, glamorous,
+    like a 1962 tourism advertisement. NOT photorealistic.
+  negative: photorealistic, photo edit, text overlay, watermark, signature
+
+# Scene setting
+scene:
+  setting: Lake Garda at golden sunset
+  description: |
+    Seven amphibious vehicles cruising together on stylized water. Warm
+    sunset sky, distant Italian hillside village, cypress trees.
+
+# Characters that appear in the mural
+characters:
+  - id: roli
+    role: hero
+    reference_photo: source/photos/1.png
+    notes: Center of the mural. Roli and girlfriend + friend in blue Amphicar B-AP 670.
+  - id: white-italian-couple
+    role: supporting
+    reference_photo: source/photos/2.png
+    notes: Two people in white Amphicar with Italian flag. One has stripy pants.
+  - id: teal-kd-couple
+    role: supporting
+    reference_photo: source/photos/3.png
+    notes: Two men in teal Amphicar with K- license plate.
+  - id: blue-abn-couple
+    role: supporting
+    reference_photo: source/photos/4.png
+    notes: Couple in light blue Amphicar AB-N 274. Titanic arms-spread pose.
+  - id: hydrofoil-guy
+    role: supporting
+    reference_photo: source/photos/5.png
+    notes: Man on hydrofoil board with golden retriever dog in red life vest. ON the water, NOT flying.
+  - id: jetranger-dutchman
+    role: supporting
+    reference_photo: source/photos/6.png
+    notes: Blue amphibious pickup truck "66568 JETRANGER". Dutch flag. Man standing arms wide.
+  - id: vv-van-family
+    role: supporting
+    reference_photo: source/photos/7.png
+    notes: White amphibious VW-type van. Woman sitting on roof in chair, couple inside.
+
+# Individual scenes (each becomes a reference image — NOT the final deliverable)
+scenes:
+  - id: hero
+    description: Teal Amphicar 770 with license plate B-AP 670, three people aboard.
+    reference_photo: source/photos/1.png
+    character_ids: [roli]
+    composition_role: hero
+  - id: white-italian
+    description: White Amphicar with Italian flag, couple — one in stripy pants.
+    reference_photo: source/photos/2.png
+    character_ids: [white-italian-couple]
+    composition_role: supporting
+  - id: teal-kd
+    description: Teal Amphicar with two men in white shirts, K-prefix plate.
+    reference_photo: source/photos/3.png
+    character_ids: [teal-kd-couple]
+    composition_role: supporting
+  - id: blue-abn
+    description: Light blue Amphicar AB-N 274, couple in Titanic arms-spread pose.
+    reference_photo: source/photos/4.png
+    character_ids: [blue-abn-couple]
+    composition_role: supporting
+  - id: hydrofoil
+    description: Man on hydrofoil board with golden retriever dog. ON the water, not in the air.
+    reference_photo: source/photos/5.png
+    character_ids: [hydrofoil-guy]
+    composition_role: supporting
+  - id: jetranger
+    description: Blue amphibious pickup truck "66568 JETRANGER", Dutch flag, man arms wide.
+    reference_photo: source/photos/6.png
+    character_ids: [jetranger-dutchman]
+    composition_role: supporting
+  - id: vv-van
+    description: White amphibious VW van, woman in chair on the roof.
+    reference_photo: source/photos/7.png
+    character_ids: [vv-van-family]
+    composition_role: supporting
+
+# Preferred generation model
+models:
+  default: grok-aurora  # Works via browser automation, short prompts (~200 chars)

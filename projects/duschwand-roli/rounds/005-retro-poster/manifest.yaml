@@ -1,0 +1,14 @@
+round: 005
+name: retro-poster
+date: 2026-04-01
+model: grok-aurora
+status: superseded
+outcome: style-dialed-in
+summary: |
+  1960s Italian travel poster style. Bold black outlines, flat colors,
+  warm golden palette. Style is right but we generated scenes for a
+  compositing workflow that doesn't work. Many alt versions.
+learnings:
+  - Retro travel poster is the right style for this project
+  - Warm sunset palette reads well
+next_step: Regenerate cleanly in round 006 with the final prompt template
