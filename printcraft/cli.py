@@ -18,6 +18,7 @@ from rich.table import Table
 
 from printcraft.project import Project
 from printcraft.generators.grok import GrokGenerator, GrokConfig
+from printcraft.compositor import deliver_mural, deliver_per_panel
 
 
 app = typer.Typer(help="PrintCraft — custom artwork for physical print surfaces")
@@ -149,6 +150,64 @@ def generate_all_scenes(
 
     ok = sum(1 for r in results if r.success)
     console.print(f"\n[bold]{ok}/{len(results)} scenes generated successfully[/bold]")
+
+
+@app.command("deliver-panels")
+def deliver_panels_cmd(
+    path: Path = typer.Argument(..., help="Project directory"),
+    mapping: list[str] = typer.Argument(..., help="panel_id=source_image pairs, e.g. left=attempt5.jpg right=attempt6.jpg"),
+    format: str = typer.Option("png", "--format", "-f", help="Output format: png | jpg | tiff"),
+    crop: str = typer.Option("center", "--crop", help="Crop anchor: center | top | bottom | left | right"),
+):
+    """Per-panel delivery: assign a different source to each panel, crop to fit.
+
+    Use this when your source images don't match the unwrapped aspect ratio —
+    better than padding, which creates visible seams.
+
+    Example:
+        printcraft deliver-panels projects/duschwand-roli \\
+          left=attempt5.jpg right=attempt6.jpg
+    """
+    p = Project.load(path)
+    panel_sources: dict[str, str] = {}
+    for pair in mapping:
+        if "=" not in pair:
+            raise typer.BadParameter(f"Expected panel_id=image, got: {pair}")
+        pid, src = pair.split("=", 1)
+        panel_sources[pid.strip()] = src.strip()
+    console.print(f"[cyan]Delivering[/cyan] {p.title} (per-panel mode)")
+    for pid, src in panel_sources.items():
+        console.print(f"  {pid} ← {src}")
+    result = deliver_per_panel(p, panel_sources, format=format, crop_anchor=crop)
+    console.print()
+    for note in result.notes:
+        console.print(f"  {note}")
+    console.print()
+    console.print(f"[green]✓ Delivered[/green] {len(result.panels)} panels")
+    console.print(f"[dim]Output: {result.panels[0].parent}[/dim]")
+
+
+@app.command("deliver")
+def deliver(
+    path: Path = typer.Argument(..., help="Project directory"),
+    source: str = typer.Argument(..., help="Source mural image (filename or path)"),
+    pad_mode: str = typer.Option("reflect", "--pad", help="Padding strategy: reflect | edge | black | white"),
+    format: str = typer.Option("png", "--format", "-f", help="Output format: png | jpg | tiff"),
+):
+    """Produce print-ready panel files from a selected mural image.
+
+    Pipeline: scale source → fit to surface dimensions → split into panels → export.
+    Writes to projects/<name>/deliverables/YYYY-MM-DD-HHMMSS-<source>/.
+    """
+    p = Project.load(path)
+    console.print(f"[cyan]Delivering[/cyan] {p.title} — source: [bold]{source}[/bold]")
+    result = deliver_mural(p, source, pad_mode=pad_mode, format=format)
+    console.print()
+    for note in result.notes:
+        console.print(f"  {note}")
+    console.print()
+    console.print(f"[green]✓ Delivered[/green] {len(result.panels)} panels")
+    console.print(f"[dim]Output: {result.panels[0].parent}[/dim]")
 
 
 if __name__ == "__main__":

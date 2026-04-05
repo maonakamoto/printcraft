@@ -3,8 +3,10 @@
 
 client: Roli
 title: Duschwand Mural
-status: in-progress
+status: shipped-v1
 created: 2026-03-25
+shipped: 2026-04-05
+deliverables_dir: deliverables/2026-04-05-193659-per-panel/
 
 # Physical surface being printed on
 surface:
