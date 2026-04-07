@@ -1,0 +1,41 @@
+round: 008
+name: face-accuracy
+date: 2026-04-07
+status: experimental
+outcome: promising
+
+summary: |
+  Hybrid approach: use the unified mural (round 007, attempt_square2) as a
+  poster-style base, then overlay the individual scene images from round 006
+  on top. The individual scenes have accurate Amphicar shapes and recognizable
+  faces (from source photo reference), while the unified mural provides
+  consistent composition, background, and style.
+
+approach: |
+  1. Load unified mural as base (consistent background, lighting, style)
+  2. For each individual scene image:
+     - Mask out black background (threshold < 40 luminance)
+     - Erode alpha mask by 1px (removes dark fringe)
+     - Feather edges with Gaussian blur (3-6px)
+     - Slightly warm-shift colors to match mural's amber palette
+  3. Scale and position each scene at its approximate location in the mural
+  4. Layer back-to-front (distant vehicles first, hero car last)
+
+results:
+  - composite_v2.jpg: All 6 individual scenes overlaid on mural base.
+    Hero Amphicar (bild1) is recognizable with B-AP 670 plate and 3 people.
+    Water seams visible but acceptable for proof. Needs further blending for
+    production.
+
+known_issues:
+  - Water transitions between individual scenes and mural base are visible
+  - Individual scenes have different water rendering than the mural
+  - Would benefit from regenerating individual scenes with matching amber water
+  - Missing bild3 (teal-kd) overlay — only 6 of 7 individual scenes used
+
+next_step: |
+  1. Re-generate individual scenes with explicit "warm amber stylized water"
+     instruction to match the mural's water palette
+  2. Use Grok inpainting to blend water transitions
+  3. OR: iterate the unified mural with better vehicle descriptions until
+     Grok draws more accurate Amphicar shapes natively (no compositing needed)
