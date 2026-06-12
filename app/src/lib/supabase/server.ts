@@ -8,6 +8,8 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      // printcraft tables live in their own schema on the shared stack
+      db: { schema: 'printcraft' },
       cookies: {
         getAll() {
           return cookieStore.getAll()
