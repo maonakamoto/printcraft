@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js'
 import { readFileSync } from 'fs'
 import { basename } from 'path'
 
-const SUPABASE_URL = 'https://ckpynkpsfnuqndplaapc.supabase.co'
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://supabase.orangecat.ch'
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 if (!SERVICE_ROLE_KEY) {
@@ -169,7 +169,7 @@ async function main() {
   }
 
   console.log('=== DONE ===')
-  console.log(`Project URL: https://printcraft-pied.vercel.app/project/${project.id}/figures`)
+  console.log(`Project URL: https://printcraft.orangecat.ch/project/${project.id}/figures`)
 }
 
 main().catch(err => {
