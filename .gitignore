@@ -32,3 +32,4 @@ projects/*/deliverables/
 # Debug artifacts
 *.log
 debug_*.png
+.vercel
