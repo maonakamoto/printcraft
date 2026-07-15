@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useState, useEffect } from 'react'
+import { use, useState } from 'react'
 import { useSurface, useUpsertSurface } from '@/hooks/useSurface'
 import { SURFACE_PRESETS, type SurfacePreset } from '@/lib/config/surface-presets'
 import { getTotalDimensions, getSeamPositionsFromPanels } from '@/lib/domain/surface'
@@ -27,15 +27,18 @@ export default function SurfacePage({ params }: { params: Promise<{ id: string }
   const [dpiTarget, setDpiTarget] = useState(200)
   const [bleedMm, setBleedMm] = useState(3)
 
-  useEffect(() => {
-    if (existingSurface) {
-      setPanels(existingSurface.panels)
-      setDeadZones(existingSurface.dead_zones)
-      setDpiTarget(existingSurface.dpi_target)
-      setBleedMm(existingSurface.bleed_mm)
-      setSurfaceType(existingSurface.type)
-    }
-  }, [existingSurface])
+  // Hydrate the form once the saved surface loads. Adjusting state during render
+  // against a remembered previous value (React "you might not need an effect")
+  // avoids the extra render pass an effect-driven setState would cause.
+  const [hydratedSurface, setHydratedSurface] = useState(existingSurface)
+  if (existingSurface && existingSurface !== hydratedSurface) {
+    setHydratedSurface(existingSurface)
+    setPanels(existingSurface.panels)
+    setDeadZones(existingSurface.dead_zones)
+    setDpiTarget(existingSurface.dpi_target)
+    setBleedMm(existingSurface.bleed_mm)
+    setSurfaceType(existingSurface.type)
+  }
 
   function applyPreset(preset: SurfacePreset) {
     setSelectedPreset(preset.id)
