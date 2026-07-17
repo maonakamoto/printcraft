@@ -1,0 +1,38 @@
+round: 009
+name: amber-water
+date: 2026-04-07
+model: grok-aurora (SuperGrok)
+status: complete
+outcome: best-so-far
+
+summary: |
+  Re-generated all 7 individual scenes with "warm amber gold stylized water"
+  instead of "black background above waterline". This makes the water palette
+  match the unified mural base (round 007), dramatically reducing composite seams.
+
+  Two composite versions produced:
+  - composite_amber.jpg: simple dark-pixel masking (visible rectangles)
+  - composite_smart_mask.jpg: edge+saturation subject detection (cleaner)
+
+  The smart-mask composite was AI-upscaled (Real-ESRGAN 4x anime + LANCZOS 2.5x)
+  and split into panels → deliverables/2026-04-07-amber-composite/
+
+prompt: |
+  Transform this photo into a 1960s Italian travel poster illustration. Bold black
+  ink outlines, flat cel-shaded colors, warm golden sunset. The water must be WARM
+  AMBER AND GOLD stylized horizontal bands — not realistic blue water. Recognizable
+  faces from the photo. No text, no watermarks.
+
+key_finding: |
+  Matching water palette between individual scenes and unified mural is the key
+  to seamless compositing. "Warm amber gold" water instruction works reliably
+  with Grok Aurora.
+
+individual_scenes:
+  hero: hero.jpg (1536px, good Amphicar shape + B-AP 670)
+  white-italian: white-italian_alt1.jpg (1488px)
+  teal-kd: teal-kd_alt1.jpg (1168px)
+  blue-abn: blue-abn_alt1.jpg (1232px)
+  hydrofoil: hydrofoil.jpg (864px, ON water not flying)
+  jetranger: jetranger.jpg (1360px, 66568 + Dutch flag)
+  vv-van: vv-van_alt1.jpg (1248px)

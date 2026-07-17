@@ -1,0 +1,13 @@
+round: 001
+name: initial
+date: 2026-03-25
+model: grok-aurora
+status: superseded
+outcome: inconsistent
+summary: |
+  First round. Mix of styles across scenes — some gouache-like, some photorealistic.
+  Proved Grok could do face likeness but had no consistent style direction.
+learnings:
+  - Grok Aurora can preserve face likeness from reference photos
+  - Without style anchoring, each scene drifts to a different look
+next_step: Anchor style via explicit reference and consistent prompt template

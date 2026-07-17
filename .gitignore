@@ -1,41 +1,54 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
+/build
+# composites/ and deliverables/ are NOT tracked (large)
+/coverage
+# debug
+# Debug artifacts
+debug_*.png
 # dependencies
+# Dependencies
+.DS_Store
+*.egg-info/
+.env*
+# env files (can opt-in for committing if needed)
+# Environment
+.env.local
+# Generated images in rounds/*/outputs/ are NOT tracked (large, reproducible)
+# IDE
+.idea/
+*.log
+# manifest.yaml, prompts/, notes.md in each round ARE tracked
+# misc
+/.next/
+next-env.d.ts
+# next.js
 /node_modules
+npm-debug.log*
+# OS
+/out/
+*.pem
 /.pnp
-.pnp.*
+.pnpm-debug.log*
+# production
+# Project outputs — keep local, don't push to git
+projects/*/composites/
+projects/*/deliverables/
+projects/*/rounds/*/outputs/
+*.pyc
+__pycache__/
+.pytest_cache/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# selected/ symlinks ARE tracked (small, documents the curation)
+# Source materials ARE tracked (source/photos, source/references, source/docs)
+# testing
+Thumbs.db
+*.tsbuildinfo
+# typescript
+# vercel
+.vscode/
 .yarn/*
+yarn-debug.log*
+yarn-error.log*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts

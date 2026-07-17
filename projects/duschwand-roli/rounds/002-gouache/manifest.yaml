@@ -1,0 +1,13 @@
+round: 002
+name: gouache
+date: 2026-03-28
+model: grok-aurora
+status: superseded
+outcome: too-photographic
+summary: |
+  Pushed for gouache painterly style. Result was still photo-like on most scenes,
+  with only slight painterly treatment. Style reference images caused color bleed.
+learnings:
+  - Uploading a style reference image contaminates colors
+  - Prose-based style description alone isn't strong enough
+next_step: Drop style-reference uploads; push harder in prompt for "retro cartoon"

@@ -1,0 +1,62 @@
+round: 007
+name: unified-mural
+date: 2026-04-05
+model: grok-aurora
+status: in-progress
+outcome: promising
+summary: |
+  Abandon compositing. Generate the full mural scene as ONE image with all 7
+  vehicles described in a single prompt. Seven attempts so far (attempt1-7),
+  varying between landscape/portrait and with/without a style-reference upload.
+attempts:
+  - id: attempt1
+    format: landscape
+    ref_upload: false
+    notes: First unified attempt. Good style, generic vehicles.
+  - id: attempt2
+    format: landscape
+    ref_upload: bild1_hero
+    notes: B-AP 670 plate visible. Consistent style.
+  - id: attempt3
+    format: landscape
+    ref_upload: bild1_hero
+    notes: Italian flag visible. Good composition.
+  - id: attempt4
+    format: landscape
+    ref_upload: bild1_hero
+    notes: "LAKE GARDA ITALY" text overlay (unwanted).
+  - id: attempt5
+    format: portrait
+    ref_upload: false
+    notes: First portrait format. "LAGO DI GARDA" text. Strong composition.
+  - id: attempt6
+    format: portrait
+    ref_upload: false
+    notes: No text, portrait. All 7 vehicles visible.
+  - id: attempt7
+    format: portrait
+    ref_upload: false
+    notes: B-AP 670 plate, JETRANGER label, sedan-like shapes.
+  - id: attempt_square1
+    format: portrait
+    ref_upload: false
+    notes: New square-format prompt. No text. All 7 vehicles. Used for LEFT panel.
+  - id: attempt_square2
+    format: portrait
+    ref_upload: false
+    notes: New square-format prompt. No text. Best composition so far. Used for RIGHT panel.
+current_best: attempt_square2
+shipped: true
+shipped_date: 2026-04-05
+shipped_deliverables:
+  - deliverables/2026-04-05-193659-per-panel/panel-left-80x200cm.png (from attempt_square1)
+  - deliverables/2026-04-05-193659-per-panel/panel-right-120x200cm.png (from attempt_square2)
+learnings:
+  - Unified generation works — no compositing seams
+  - Portrait format requires explicit prompt ("tall vertical", "portrait orientation")
+  - Text overlays sneak in unless prompt says "no text" explicitly
+  - Style reference upload is optional; pure text prompts also work with enough detail
+next_step: |
+  1. Pick final attempt(s) with user
+  2. Upscale to print resolution (target 11,811×11,811 px at 150 DPI)
+  3. Split into two panels for print shop
