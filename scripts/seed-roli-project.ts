@@ -169,7 +169,7 @@ async function main() {
   }
 
   console.log('=== DONE ===')
-  console.log(`Project URL: https://printcraft-pied.vercel.app/project/${project.id}/figures`)
+  console.log(`Project URL: https://printcraft.orangecat.ch/project/${project.id}/figures`)
 }
 
 main().catch(err => {
