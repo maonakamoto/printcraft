@@ -1,0 +1,34 @@
+# Minimal CI floor: lint + typecheck (npm run verify) and a production build.
+# Purpose is to stop the repo silently rotting — not to run a test suite.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Lint + typecheck.
+      - run: npm run verify
+
+      # Production build. The build statically prerenders pages that construct a
+      # Supabase browser client, so it needs the two NEXT_PUBLIC_ values to be
+      # PRESENT (non-empty) — no live database or real secret is required. These
+      # are deliberately fake placeholders, safe to commit (the anon key is a
+      # public client value by design).
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key-ci-build-only
