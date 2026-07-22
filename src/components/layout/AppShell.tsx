@@ -32,10 +32,14 @@ export function AppShell({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Close mobile menu on route change
-  useEffect(() => {
+  // Close the mobile menu on route change. Adjusting state during render with a
+  // remembered previous value (React "you might not need an effect") avoids the
+  // cascading re-render an effect-driven setState would trigger.
+  const [prevPathname, setPrevPathname] = useState(pathname)
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname)
     setMobileMenuOpen(false)
-  }, [pathname])
+  }
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
