@@ -1,0 +1,63 @@
+# CI floor — modelled on dotfiles/templates/ci/ci-npm.yml.
+#
+# NB: the deployed application is `app/`, NOT the repo root. The fleet deploy
+# registry (fleetcrown/scripts/hetzner/apps.conf) pins
+#   printcraft|4015|printcraft.orangecat.ch|/home/g/dev/printcraft|app|-
+# i.e. APP_DIR=app, so deploy.sh builds in `app/` and ships `app/.next/standalone`.
+# The root-level Next tree (root `src/`, `next.config.ts`, `package.json`, …) is a
+# stale March-2026 duplicate that nothing builds. CI gates the tree that ships.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# A newer push makes the older run obsolete — don't waste minutes finishing it.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: app
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          # 22 = the version deploy.sh actually builds the standalone bundle on.
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      # SSOT: "verified" is defined ONCE, in app/package.json `verify`
+      # (= lint + typecheck; this repo has no test suite), and run identically
+      # here and locally via `npm run verify`. Change the checks in one place.
+      - name: Verify
+        run: npm run verify
+
+      - name: Build
+        # Hermetic compile. NEXT_PUBLIC_* are baked at build time and the static
+        # pages construct a Supabase browser client, which throws on missing
+        # vars — these are fake, non-secret placeholders. No DB is contacted.
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
+        run: npm run build
+
+      - name: Deploy contract — standalone output exists
+        # deploy.sh aborts with "no standalone output" if next.config.ts ever
+        # loses `output: "standalone"`. Catch that here, not at deploy time.
+        run: test -f "$(find .next/standalone -maxdepth 4 -name server.js -not -path '*node_modules*' | head -1)"
