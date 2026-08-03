@@ -6,12 +6,8 @@
 import { createClient } from '@supabase/supabase-js'
 import { readFileSync } from 'fs'
 import { basename } from 'path'
-import { DB_SCHEMA } from '../src/lib/supabase/schema'
-import { GUEST_USER_ID } from '../src/lib/constants'
 
-const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://supabase.orangecat.ch'
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://printcraft.orangecat.ch'
+const SUPABASE_URL = 'https://ckpynkpsfnuqndplaapc.supabase.co'
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 if (!SERVICE_ROLE_KEY) {
@@ -19,11 +15,9 @@ if (!SERVICE_ROLE_KEY) {
   process.exit(1)
 }
 
-const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
-  db: { schema: DB_SCHEMA },
-})
+const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
 const BUCKET = 'project-files'
-const USER_ID = GUEST_USER_ID
+const USER_ID = 'fee8f90d-30b0-4b38-9495-c65acd17eef6'
 
 interface FigureDef {
   label: string
@@ -175,7 +169,7 @@ async function main() {
   }
 
   console.log('=== DONE ===')
-  console.log(`Project URL: ${APP_URL}/project/${project.id}/figures`)
+  console.log(`Project URL: https://printcraft-pied.vercel.app/project/${project.id}/figures`)
 }
 
 main().catch(err => {
