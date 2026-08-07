@@ -18,7 +18,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "PrintCraft — Scene Composer for Physical Art",
   description: "Turn separate photos of real people into one unified artwork — printed on surfaces that matter.",
-  metadataBase: new URL("https://printcraft.app"),
+  // Kept in step with app/src/app/layout.tsx, which is the tree CI builds.
+  // printcraft.app does not serve this app, so the generated og:image resolved
+  // to a 404 and every social scraper discarded the preview.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://printcraft.orangecat.ch"),
   openGraph: {
     title: "PrintCraft — Scene Composer for Physical Art",
     description: "Turn separate photos of real people into one unified artwork — printed on surfaces that matter.",
